@@ -1,9 +1,9 @@
-const expressHttpContextCorrelationId = require('../express-nemo/packages/express-nemo-correlation-id')
-const expressHttpContextLogger = require('../express-nemo/packages/express-nemo-logger')
-const expressHttpContextRequestResponseLogger = require('../express-nemo/packages/express-nemo-request-response-logger')
-const expressHttpContextPerformace = require('../express-nemo/packages/express-nemo-performance')
-const expressHttpContextErrorResponse = require('../express-nemo/packages/express-nemo-error-response')
-const expressHttpContextErrorLogger = require('../express-nemo/packages/express-nemo-error-logger')
+const expressHttpContextCorrelationId = require('express-nemo-correlation-id')
+const expressHttpContextLogger = require('express-nemo-logger')
+const expressHttpContextRequestResponseLogger = require('express-nemo-request-response-logger')
+const expressHttpContextPerformace = require('express-nemo-performance')
+const expressHttpContextErrorResponse = require('express-nemo-error-response')
+const expressHttpContextErrorLogger = require('express-nemo-error-logger')
 const performaceMonitor = expressHttpContextPerformace()
 
 const enhancedBy = (req, res, next) => {
