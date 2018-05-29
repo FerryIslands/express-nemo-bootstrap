@@ -12,7 +12,8 @@
     "express-nemo-error-response": "^1.0.0",
     "express-nemo-logger": "^0.1.0",
     "express-nemo-performance": "^0.1.0",
-    "express-nemo-request-response-logger": "^0.1.0"
+    "express-nemo-request-response-logger": "^0.1.0",
+    "express-nemo-route-not-found": "^0.1.0"
   },
   "devDependencies": {
     "eslint-config-standard": "^11.0.0",
