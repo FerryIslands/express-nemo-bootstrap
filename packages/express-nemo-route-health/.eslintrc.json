@@ -1,0 +1,8 @@
+{
+  "plugins": ["standard"],
+  "rules": {
+    "jsx-quotes": ["error", "prefer-single"]
+  },
+  "extends": ["standard"]
+}
+

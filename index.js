@@ -5,13 +5,15 @@ const expressHttpContextPerformace = require('express-nemo-performance')
 const expressHttpContextErrorResponse = require('express-nemo-error-response')
 const expressHttpContextErrorLogger = require('express-nemo-error-logger')
 const expressHttpNotFoundRoute = require('express-nemo-route-not-found')
+const expressHttpPingRoute = require('./packages/express-nemo-route-ping')
+const expressHttpHealthRoute = require('./packages/express-nemo-route-health')
+
 const performaceMonitor = expressHttpContextPerformace()
 
 const enhancedBy = (req, res, next) => {
   res.set('X-Ehanced-By', 'TM-Express')
   next()
 }
-
 
 const defaults = {
   application: 'TM-Express-App'
@@ -32,10 +34,17 @@ module.exports = options => {
       expressHttpContextLogger({ loggerFactory })
     ],
 
+    ping: expressHttpPingRoute({
+      responseTemplate: responseFactory.pingResponse
+    }),
+
+    health: expressHttpHealthRoute({
+      responseTemplate: responseFactory.healthResponse,
+      checks: options.healthchecks
+    }),
+
     post: [
-      expressHttpNotFoundRoute({
-        notFoundResponseTemplate: responseFactory.notFoundResponseTemplate
-      }),
+      expressHttpNotFoundRoute(responseFactory.notFoundResponse),
       performaceMonitor.end,
       expressHttpContextErrorLogger({
         eventTemplate: logEventFactory.createErrorLogEvent
