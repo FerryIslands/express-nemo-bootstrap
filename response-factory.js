@@ -18,8 +18,8 @@ module.exports = options => {
       }
     }
   }
-  const errorResponseTemplate = (err, req) => {
-    const statusCode = 500
+  const errorResponseTemplate = (err, req, res) => {
+    const statusCode = res.statusCode
     let errorResponse = {
       error: {
         type: err.name,
