@@ -13,15 +13,6 @@ describe('express-nemo-route-ping', () => {
           ).to.throw()
         })
       })
-      context('when no respond to client is provided', () => {
-        it('throws an error', () => {
-          expect(() =>
-            middleware({
-              respondToClient: null
-            })
-          ).to.throw()
-        })
-      })
     })
 
     context('valid', () => {
@@ -33,6 +24,7 @@ describe('express-nemo-route-ping', () => {
       })
     })
   })
+
   context('middleware is called', () => {
     let nextCalled
     let callArgs
@@ -80,8 +72,8 @@ describe('express-nemo-route-ping', () => {
       let calledCorrectly
 
       mw = middleware({
-        respondToClient: (response, responseData) =>
-          (calledCorrectly = response === res)
+        responseTemplate: (request, response) =>
+          (calledCorrectly = request === req && response === res)
       })
       mw(req, res, next)
       expect(calledCorrectly).to.be.true

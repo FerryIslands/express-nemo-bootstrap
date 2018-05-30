@@ -1,8 +1,7 @@
 const moment = require('moment')
 
 const defaults = {
-  responseTemplate: `I'm alive: ${moment().format()}`,
-  respondToClient: (res, response) => { res.send(response) }
+  responseTemplate: (req, res) => `I'm alive: ${moment().format()}`
 }
 
 module.exports = options => {
@@ -12,13 +11,9 @@ module.exports = options => {
     throw new Error('[Options] Missing responseTemplate')
   }
 
-  if (!options.respondToClient || typeof options.respondToClient !== 'function') {
-    throw new Error('[Options] Missing respondToClient function')
-  }
-
   const middleware = (req, res, next) => {
-    options.respondToClient(res, options.responseTemplate)
-
+    const response = options.responseTemplate(req, res)
+    res.send(response)
     next()
   }
 

@@ -17,18 +17,22 @@ module.exports = options => {
     }
   }
 
-  const pingResponse = {
-    respondToClient: (res, response) => {
-      res.json(response)
-    },
-    responseTemplate: {
+  const pingResponse = (req, res) => {
+    return {
       "I'm alive": moment().format()
     }
   }
 
   const healthResponse = {
     getAllSubSystems: () => {
-      return [{name: 'testSystem', status: async () => { return 'OK' }}]
+      return [
+        {
+          name: 'testSystem',
+          status: async () => {
+            return 'OK'
+          }
+        }
+      ]
     },
 
     subSystemTemplate: (name, status) => {

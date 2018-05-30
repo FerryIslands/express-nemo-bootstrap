@@ -34,7 +34,9 @@ module.exports = options => {
       expressHttpContextLogger({ loggerFactory })
     ],
 
-    ping: expressHttpPingRoute(responseFactory.pingResponse),
+    ping: expressHttpPingRoute({
+      responseTemplate: responseFactory.pingResponse
+    }),
     health: expressHttpHealthRoute(responseFactory.healthResponse),
 
     post: [
