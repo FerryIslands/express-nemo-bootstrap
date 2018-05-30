@@ -49,7 +49,9 @@ module.exports = options => {
       expressHttpContextErrorLogger({
         eventTemplate: logEventFactory.createErrorLogEvent
       }),
-      expressHttpContextErrorResponse(),
+      expressHttpContextErrorResponse({
+        errorMessageTemplate: responseFactory.errorResponseTemplate
+      }),
       expressHttpContextRequestResponseLogger({
         logEventFactory: logEventFactory.createRequestResponseLogEvent
       })

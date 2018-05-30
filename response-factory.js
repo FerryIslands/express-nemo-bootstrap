@@ -1,5 +1,7 @@
 const moment = require('moment')
 
+const debugEnabled = () => process.env.NODE_ENV === 'DEV'
+
 module.exports = options => {
   const notFoundResponse = {
     notFoundResponseTemplate: (req, res) => {
@@ -15,6 +17,29 @@ module.exports = options => {
         }
       }
     }
+  }
+  const errorResponseTemplate = (err, req, res) => {
+    const statusCode = res.statusCode
+    let errorResponse = {
+      error: {
+        type: err.name,
+        message: 'Unhandled error',
+        details: `An error occured when executing handler for path '${
+          req.url
+        }'`,
+        http: {
+          code: statusCode,
+          status: 'Internal Server Error'
+        }
+      }
+    }
+
+    if (debugEnabled()) {
+      errorResponse.error.message = err.message
+      errorResponse.error.stacktrace = (err.stack || '').split('\n')
+    }
+
+    return errorResponse
   }
 
   const pingResponse = (req, res) => {
@@ -36,6 +61,7 @@ module.exports = options => {
 
   return {
     notFoundResponse: notFoundResponse,
+    errorResponseTemplate: errorResponseTemplate,
     pingResponse: pingResponse,
     healthResponse: healthResponse
   }
