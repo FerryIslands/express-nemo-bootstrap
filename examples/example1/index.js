@@ -28,7 +28,9 @@ const PORT = process.env.PORT || 4000
 const helloRoute = (req, res, next) => {
   req.context.logger.debug('Hit the hello route')
   res.status(200).send({
-    correlationId: req.context.correlationId
+    data: {
+      correlationId: req.context.correlationId
+    }
   })
   next()
 }
