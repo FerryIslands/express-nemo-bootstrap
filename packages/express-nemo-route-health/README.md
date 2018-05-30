@@ -6,9 +6,25 @@ If any subsystem has a status of Failure it will respond with HTTP 424 - FAILED 
 
 ## Options
 
-| Name                | Required | Default value | Description                                                                                                 |
-| ------------------- | -------- | ------------- | ----------------------------------------------------------------------------------------------------------- |
-| getAllSubSystems    | true     | undefined     | a function that returns an array of subsystem name: string,  status: async function                         |
-| mainSystemTemplate  | -        | function      | a function that receives a status (OK/Failure) and an array based on subSystemTemplate it returns an string |
-| subSystemTemplate   | -        | function      | a function that receives subsystem name and its status, returns a string                                    |
-| respondToClient     | -        | function      | a function that receives res object and the string produced from mainSystemTemplate                         |
+| Name             | Required | Default value | Description                                                                                         |
+| ---------------- | -------- | ------------- | --------------------------------------------------------------------------------------------------- |
+| responseTemplate |          | function      | A function receiving the request and response object, returning a response to message to send back. |
+| checks           | yes      |               | An array of checks to perform when the health route is called                                       |
+
+## Checks
+
+| Name  | Required | Default value | Description                               |
+| ----- | -------- | ------------- | ----------------------------------------- |
+| name  | yes      |               | The name of the healthcheck               |
+| check | yes      |               | An async function returning OK or Failure |
+
+### Example check
+
+```js
+{
+  name: 'mongo-db',
+  check: async () => {
+    return 'OK'
+  }
+}
+```

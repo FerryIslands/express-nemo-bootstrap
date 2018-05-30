@@ -1,58 +1,41 @@
 const defaults = {
-  mainSystemTemplate: (main, subSystems) => {
-    let response = `status: ${main.status}\n`
-    response += subSystems.join()
-    return response
-  },
-  subSystemTemplate: (name, status) => {
-    return `name: ${name} status: ${status}\n`
-  },
-  respondToClient: (res, response) => {
-    res.send(response)
+  responseTemplate: (results, req, res) => {
+    return `Status: ${
+      results.every(result => result.status === 'OK') ? 'OK' : 'Failure'
+    }`
   }
 }
 
 module.exports = options => {
   options = { ...defaults, ...options }
 
-  if (!options.getAllSubSystems || typeof options.getAllSubSystems !== 'function') {
-    throw new Error('[Options] Missing getAllSubSystems function')
+  if (!options.checks || !Array.isArray(options.checks)) {
+    throw new Error('[Options] Missing checks array')
   }
 
-  if (!options.mainSystemTemplate || typeof options.mainSystemTemplate !== 'function') {
-    throw new Error('[Options] Missing mainSystemTemplate function')
-  }
-
-  if (!options.subSystemTemplate || typeof options.subSystemTemplate !== 'function') {
-    throw new Error('[Options] Missing subSystemTemplate function')
-  }
-
-  if (!options.respondToClient || typeof options.respondToClient !== 'function') {
-    throw new Error('[Options] Missing respondToClient function')
+  if (
+    !options.responseTemplate ||
+    typeof options.responseTemplate !== 'function'
+  ) {
+    throw new Error('[Options] Missing responseTemplate')
   }
 
   const middleware = async (req, res, next) => {
-    // Fetch status
-    let subSystemsStatus = []
-    for (let subSystem of options.getAllSubSystems()) {
-      subSystemsStatus.push({name: subSystem.name, status: await subSystem.status()})
+    let results = []
+
+    for (let healtCheck of options.checks) {
+      results.push({
+        name: healtCheck.name,
+        status: await healtCheck.check()
+      })
     }
 
-    // Build client response
-    const systemInfo = {status: subSystemsStatus.every(subsystem => subsystem.status === 'OK') ? 'OK' : 'Failure'}
+    const response = options.responseTemplate(results, req, res)
+    const statusCode = results.every(result => result.status === 'OK')
+      ? 200
+      : 424
 
-    let subSystemsStatusTemplateData = []
-    for (let subSystem of subSystemsStatus) {
-      subSystemsStatusTemplateData.push(
-        options.subSystemTemplate(subSystem.name, subSystem.status)
-      )
-    }
-    const response = options.mainSystemTemplate(systemInfo, subSystemsStatusTemplateData)
-
-    // Send to client
-    res.statusCode = systemInfo.status === 'OK' ? 200 : 424
-    options.respondToClient(res, response)
-
+    res.status(statusCode).send(response)
     next()
   }
 
