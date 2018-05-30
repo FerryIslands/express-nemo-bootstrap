@@ -1,6 +1,26 @@
 const express = require('express')
 const middleware = require('../../index')({
-  application: 'tm-example'
+  application: 'tm-example',
+  healthchecks: [
+    {
+      name: 'mongo-db',
+      check: async () => {
+        return 'OK'
+      }
+    },
+    {
+      name: 'sqlserver-db',
+      check: async () => {
+        return 'Failure'
+      }
+    },
+    {
+      name: 'external-api',
+      check: async () => {
+        return 'OK'
+      }
+    }
+  ]
 })
 
 const PORT = process.env.PORT || 4000

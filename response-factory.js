@@ -23,33 +23,15 @@ module.exports = options => {
     }
   }
 
-  const healthResponse = {
-    getAllSubSystems: () => {
-      return [
-        {
-          name: 'testSystem',
-          status: async () => {
-            return 'OK'
-          }
-        }
-      ]
-    },
+  const healthResponse = (results, req, res) => {
+    const allChecksPassed = results.every(result => result.status === 'OK')
 
-    subSystemTemplate: (name, status) => {
-      return { name: name, status: status }
-    },
-
-    mainSystemTemplate: (main, subSystems) => {
-      let response = {
-        status: main.status,
-        subSystemStatus: subSystems
-      }
-
-      return response
-    },
-    respondToClient: (res, response) => {
-      res.json(response)
+    const systemInfo = {
+      status: allChecksPassed ? 'OK' : 'Failure',
+      subSystemStatus: results
     }
+
+    return systemInfo
   }
 
   return {

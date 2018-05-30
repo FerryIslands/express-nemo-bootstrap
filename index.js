@@ -37,7 +37,11 @@ module.exports = options => {
     ping: expressHttpPingRoute({
       responseTemplate: responseFactory.pingResponse
     }),
-    health: expressHttpHealthRoute(responseFactory.healthResponse),
+
+    health: expressHttpHealthRoute({
+      responseTemplate: responseFactory.healthResponse,
+      checks: options.healthchecks
+    }),
 
     post: [
       expressHttpNotFoundRoute(responseFactory.notFoundResponse),
