@@ -1,0 +1,38 @@
+{
+  "name": "express-nemo-route-health",
+  "version": "1.0.0",
+  "description": "A middleware for express to add a route that handles health route in an api.",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha './{,!(node_modules)/**/}*.spec.js' --reporter spec --slow 10",
+    "test:watch": "mocha './{,!(node_modules)/**/}*.spec.js' --reporter spec --watch --slow 10"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/StenaIT/express-nemo.git"
+  },
+  "keywords": [
+    "stena",
+    "express",
+    "middleware",
+    "http",
+    "route",
+    "health"
+  ],
+  "author": "giorgio.salmi@stena.com",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/StenaIT/express-nemo/issues"
+  },
+  "homepage": "https://github.com/StenaIT/express-nemo#readme",
+  "devDependencies": {
+    "chai": "^4.1.2",
+    "eslint-config-standard": "^11.0.0",
+    "eslint-plugin-import": "^2.12.0",
+    "eslint-plugin-node": "^6.0.1",
+    "eslint-plugin-promise": "^3.8.0",
+    "eslint-plugin-standard": "^3.1.0",
+    "mocha": "^5.2.0",
+    "prettier-eslint": "^8.8.1"
+  }
+}
