@@ -5,8 +5,8 @@ const expressHttpContextPerformace = require('express-nemo-performance')
 const expressHttpContextErrorResponse = require('express-nemo-error-response')
 const expressHttpContextErrorLogger = require('express-nemo-error-logger')
 const expressHttpNotFoundRoute = require('express-nemo-route-not-found')
-const expressHttpPingRoute = require('./packages/express-nemo-route-ping')
-const expressHttpHealthRoute = require('./packages/express-nemo-route-health')
+const expressHttpPingRoute = require('express-nemo-route-ping')
+const expressHttpHealthRoute = require('express-nemo-route-health')
 
 const performaceMonitor = expressHttpContextPerformace()
 

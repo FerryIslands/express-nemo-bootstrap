@@ -13,7 +13,9 @@
     "express-nemo-logger": "^0.1.0",
     "express-nemo-performance": "^0.1.0",
     "express-nemo-request-response-logger": "^0.1.0",
+    "express-nemo-route-health": "^1.0.0",
     "express-nemo-route-not-found": "^0.1.0",
+    "express-nemo-route-ping": "^1.0.0",
     "moment": "^2.22.1"
   },
   "devDependencies": {
