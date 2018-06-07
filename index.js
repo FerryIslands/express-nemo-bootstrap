@@ -11,12 +11,12 @@ const expressHttpHealthRoute = require('express-nemo-route-health')
 const performaceMonitor = expressHttpContextPerformace()
 
 const enhancedBy = (req, res, next) => {
-  res.set('X-Ehanced-By', 'TM-Express')
+  res.set('X-Ehanced-By', 'express-nemo-bootstrap')
   next()
 }
 
 const defaults = {
-  application: 'TM-Express-App'
+  application: 'tm-express-app'
 }
 
 module.exports = options => {
