@@ -7,6 +7,7 @@
   "author": "Giorgio Salmi <giorgio.salmi@stena.com>",
   "private": true,
   "dependencies": {
+    "express": "^4.16.3",
     "express-nemo-correlation-id": "^0.1.0",
     "express-nemo-error-logger": "^1.0.0",
     "express-nemo-error-response": "^1.1.0",

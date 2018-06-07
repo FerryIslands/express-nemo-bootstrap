@@ -1,60 +1,27 @@
-const expressHttpContextCorrelationId = require('express-nemo-correlation-id')
-const expressHttpContextLogger = require('express-nemo-logger')
-const expressHttpContextRequestResponseLogger = require('express-nemo-request-response-logger')
-const expressHttpContextPerformace = require('express-nemo-performance')
-const expressHttpContextErrorResponse = require('express-nemo-error-response')
-const expressHttpContextErrorLogger = require('express-nemo-error-logger')
-const expressHttpNotFoundRoute = require('express-nemo-route-not-found')
-const expressHttpPingRoute = require('express-nemo-route-ping')
-const expressHttpHealthRoute = require('express-nemo-route-health')
-
-const performaceMonitor = expressHttpContextPerformace()
-
-const enhancedBy = (req, res, next) => {
-  res.set('X-Ehanced-By', 'express-nemo-bootstrap')
-  next()
-}
-
-const defaults = {
-  application: 'tm-express-app'
-}
+const express = require('express')
 
 module.exports = options => {
-  options = { ...defaults, ...options }
+  const middlewares = require('./middlewares')(options)
 
-  const loggerFactory = require('./logger-factory')(options)
-  const logEventFactory = require('./log-event-factory')(options)
-  const responseFactory = require('./response-factory')(options)
+  const PORT = process.env.PORT || 4000
 
   return {
-    pre: [
-      enhancedBy,
-      performaceMonitor.start,
-      expressHttpContextCorrelationId(),
-      expressHttpContextLogger({ loggerFactory })
-    ],
+    options: { ...options },
 
-    ping: expressHttpPingRoute({
-      responseTemplate: responseFactory.pingResponse
-    }),
+    serve: bootstrap => {
+      const server = express()
 
-    health: expressHttpHealthRoute({
-      responseTemplate: responseFactory.healthResponse,
-      checks: options.healthchecks
-    }),
+      server
+        .use(middlewares.pre)
+        .get('/ping', middlewares.ping)
+        .get('/health', middlewares.health)
 
-    post: [
-      expressHttpNotFoundRoute(responseFactory.notFoundResponse),
-      performaceMonitor.end,
-      expressHttpContextErrorLogger({
-        eventTemplate: logEventFactory.createErrorLogEvent
-      }),
-      expressHttpContextErrorResponse({
-        errorMessageTemplate: responseFactory.errorResponseTemplate
-      }),
-      expressHttpContextRequestResponseLogger({
-        logEventFactory: logEventFactory.createRequestResponseLogEvent
-      })
-    ]
+      bootstrap(server)
+
+      server.use(middlewares.post).listen(PORT, () =>
+        // TODO: Use logger
+        console.log(`Server is now running on port ${PORT}`)
+      )
+    }
   }
 }

@@ -7,10 +7,7 @@
   "license": "MIT",
   "author": "Giorgio Salmi <giorgio.salmi@stena.com>",
   "private": true,
-  "dependencies": {
-    "express": "^4.16.3",
-    "moment": "^2.22.1"
-  },
+  "dependencies": {},
   "devDependencies": {
     "eslint-config-standard": "^11.0.0",
     "eslint-plugin-import": "^2.12.0",
