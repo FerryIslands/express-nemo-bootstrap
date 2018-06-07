@@ -30,4 +30,4 @@ nemo({
       }
     }
   ]
-}).serve(router => router.get('/hello', helloRoute).get('/error', errorRoute))
+}).serve(server => server.get('/hello', helloRoute).get('/error', errorRoute))
