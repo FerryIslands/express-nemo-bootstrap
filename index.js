@@ -5,7 +5,7 @@ const defaultOptions = {
   basePath: '/'
 }
 
-module.exports = options => {
+const expressNemo = options => {
   options = { ...defaultOptions, ...options }
 
   const middlewares = require('./middlewares')(options)
@@ -45,3 +45,7 @@ module.exports = options => {
     }
   }
 }
+
+expressNemo.express = express
+
+module.exports = expressNemo
