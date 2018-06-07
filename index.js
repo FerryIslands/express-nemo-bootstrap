@@ -1,7 +1,13 @@
 const express = require('express')
 const Logger = require('./logger')
 
+const defaultOptions = {
+  basePath: '/'
+}
+
 module.exports = options => {
+  options = { ...defaultOptions, ...options }
+
   const middlewares = require('./middlewares')(options)
 
   const PORT = process.env.PORT || 4000
@@ -14,21 +20,22 @@ module.exports = options => {
   })
 
   return {
-    options: { ...options },
+    options: options,
 
     serve: bootstrap => {
-      const app = express()
+      const nemoApp = express()
+      nemoApp.use(middlewares.pre)
 
-      app
-        .use(middlewares.pre)
+      const routedApp = express()
+      routedApp
         .get('/ping', middlewares.ping)
         .get('/health', middlewares.health)
 
-      bootstrap(app)
+      bootstrap(routedApp)
 
-      app.use(middlewares.post)
+      nemoApp.use(options.basePath, routedApp).use(middlewares.post)
 
-      const server = app.listen(PORT, () =>
+      const server = nemoApp.listen(PORT, () =>
         logger.info(`Server is now running on port ${PORT}`)
       )
 
