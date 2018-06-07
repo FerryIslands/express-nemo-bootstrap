@@ -1,34 +1,39 @@
 const express = require('express')
+const Logger = require('./logger')
 
 module.exports = options => {
   const middlewares = require('./middlewares')(options)
 
   const PORT = process.env.PORT || 4000
+  const logger = new Logger({
+    context: {
+      origin: {
+        name: options.application
+      }
+    }
+  })
 
   return {
     options: { ...options },
 
     serve: bootstrap => {
-      const server = express()
+      const app = express()
 
-      server
+      app
         .use(middlewares.pre)
         .get('/ping', middlewares.ping)
         .get('/health', middlewares.health)
 
-      bootstrap(server)
+      bootstrap(app)
 
-      server.use(middlewares.post).listen(PORT, () =>
-        // TODO: Use logger
-        console.log(`Server is now running on port ${PORT}`)
+      app.use(middlewares.post)
+
+      const server = app.listen(PORT, () =>
+        logger.info(`Server is now running on port ${PORT}`)
       )
 
       process.on('SIGTERM', () => {
-        server.stop(() => {
-          // TODO: Use logger
-          console.log(`Stopping server`)
-          process.exit(1)
-        })
+        server.close(() => logger.info(`Shutting down server...`))
       })
     }
   }

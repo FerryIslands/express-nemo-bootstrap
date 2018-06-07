@@ -1,15 +1,14 @@
-module.exports = options => {
-  const log = (level, args) => {
-    const loggerArgs = []
-    args.forEach(arg => loggerArgs.push(JSON.stringify(arg, null, 0)))
-    console[level].apply(console, loggerArgs)
-  }
+const Logger = require('./logger')
 
+module.exports = options => {
   const createLogger = (req, res) => {
-    return {
-      debug: (...args) => log('debug', args),
-      error: (...args) => log('error', args)
-    }
+    return new Logger({
+      context: {
+        origin: {
+          name: options.application
+        }
+      }
+    })
   }
 
   return createLogger

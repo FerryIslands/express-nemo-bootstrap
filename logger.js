@@ -54,8 +54,11 @@ const log = (data, level, context) => {
 }
 
 class Logger {
-  constructor () {
-    this.context = {}
+  constructor (options) {
+    options = options || {}
+    this.context = {
+      ...options.context
+    }
   }
 
   debug (data) {

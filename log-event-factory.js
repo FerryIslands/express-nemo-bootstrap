@@ -1,5 +1,4 @@
 const { URL } = require('url')
-const path = require('path')
 
 const isSecure = req =>
   req.connection.encrypted || req.headers['x-forwarded-proto'] === 'https'
@@ -11,9 +10,7 @@ const buildLogEvent = (req, le) => {
   const correlationId = req.context.correlationId
   const logEvent = {
     context: {
-      origin: {
-        logger: path.basename(__filename)
-      },
+      origin: {},
       tracing: {
         correlationId
       }
