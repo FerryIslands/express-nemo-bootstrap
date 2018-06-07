@@ -2,7 +2,8 @@
   "name": "example1",
   "version": "0.1.0",
   "scripts": {
-    "start": "node index.js"
+    "start": "ALLOW_CORS=false node index.js",
+    "start:cors": "ALLOW_CORS=true node index.js"
   },
   "license": "MIT",
   "author": "Giorgio Salmi <giorgio.salmi@stena.com>",

@@ -11,6 +11,7 @@
     "test:watch": "mocha './{,!(node_modules)/**/}*.spec.js' --reporter spec --watch --slow 10"
   },
   "dependencies": {
+    "cors": "^2.8.4",
     "deep-extend": "^0.5.0",
     "express": "^4.16.3",
     "express-nemo-correlation-id": "^0.1.0",
