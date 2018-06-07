@@ -22,6 +22,14 @@ module.exports = options => {
         // TODO: Use logger
         console.log(`Server is now running on port ${PORT}`)
       )
+
+      process.on('SIGTERM', () => {
+        server.stop(() => {
+          // TODO: Use logger
+          console.log(`Stopping server`)
+          process.exit(1)
+        })
+      })
     }
   }
 }
