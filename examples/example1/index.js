@@ -20,7 +20,7 @@ nemo({
     {
       name: 'sqlserver-db',
       check: async () => {
-        return 'Failure'
+        return 'OK'
       }
     },
     {
