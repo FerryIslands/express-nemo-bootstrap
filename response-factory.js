@@ -1,4 +1,5 @@
 const moment = require('moment')
+const HttpStatus = require('http-status-codes')
 
 const debugEnabled = () => process.env.NODE_ENV === 'DEV'
 
@@ -20,16 +21,19 @@ module.exports = options => {
   }
   const errorResponseTemplate = (err, req, res) => {
     const statusCode = res.statusCode
+    const statusMessage =
+      HttpStatus.getStatusText(statusCode) || HttpStatus.getStatusText(500)
+
     let errorResponse = {
       error: {
         type: err.name,
-        message: 'Unhandled error',
+        message: 'Error',
         details: `An error occured when executing handler for path '${
           req.url
         }'`,
         http: {
           code: statusCode,
-          status: 'Internal Server Error'
+          status: statusMessage
         }
       }
     }
