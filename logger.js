@@ -8,7 +8,7 @@ const loggingDisabled = () => {
 const getDefaultStructure = () => {
   return {
     timestamp: moment().format(),
-    level: 'trace',
+    level: 'debug',
     message: 'Missing message!',
     context: {
       origin: {
