@@ -21,6 +21,7 @@ const expressNemo = options => {
 
   return {
     options: options,
+    middlewares: middlewares,
 
     serve: bootstrap => {
       const nemoApp = express()
@@ -31,7 +32,7 @@ const expressNemo = options => {
         .get('/ping', middlewares.ping)
         .get('/health', middlewares.health)
 
-      bootstrap(routedApp)
+      bootstrap(routedApp, middlewares)
 
       nemoApp.use(options.basePath, routedApp).use(middlewares.post)
 
