@@ -1,4 +1,6 @@
 const cors = require('cors')
+const jwksRsa = require('jwks-rsa')
+const expressHttpContextAuth0JwtVerify = require('express-nemo-auth0-jwt-verify')
 const expressHttpContextCorrelationId = require('express-nemo-correlation-id')
 const expressHttpContextLogger = require('express-nemo-logger')
 const expressHttpContextRequestResponseLogger = require('express-nemo-request-response-logger')
@@ -66,6 +68,25 @@ module.exports = options => {
       expressHttpContextCorrelationId(),
       expressHttpContextLogger({ loggerFactory })
     ],
+
+    auth: expressHttpContextAuth0JwtVerify({
+      jwt: {
+        // Dynamically provide a signing key
+        // based on the kid in the header and
+        // the signing keys provided by the JWKS endpoint.
+        secret: jwksRsa.expressJwtSecret({
+          cache: true,
+          rateLimit: true,
+          jwksRequestsPerMinute: 5,
+          jwksUri: `https://nem0.eu.auth0.com/.well-known/jwks.json`
+        }),
+
+        // Validate the audience and the issuer.
+        audience: 'https://nemo.stena.io/api',
+        issuer: `https://nem0.eu.auth0.com/`,
+        algorithms: ['RS256']
+      }
+    }),
 
     ping: expressHttpPingRoute({
       responseTemplate: responseFactory.pingResponse
