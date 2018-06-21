@@ -1,0 +1,109 @@
+#!/usr/bin/env bash
+
+ok () {
+  echo "[ ok ] ${*}"
+}
+
+fail () {
+  echo "[fail] ${1:?} (HTTP ${3:-??} - ${2:?})"
+  if [[ "${4}" != "" ]]; then
+    echo "${4}" | jq
+  fi
+}
+
+skip () {
+  echo "[skip] ${*}"
+}
+
+http () {
+  export HTTP_RESPONSE
+  export HTTP_BODY
+  export HTTP_STATUS
+  HTTP_RESPONSE="$(curl --silent --write-out "HTTPSTATUS:%{http_code}" "$@")"
+  HTTP_BODY="$(echo $HTTP_RESPONSE | sed -e 's/HTTPSTATUS\:.*//g')"
+  HTTP_STATUS="$(echo $HTTP_RESPONSE | tr -d '\n' | sed -e 's/.*HTTPSTATUS://')"
+  return ${HTTP_STATUS:?}
+}
+
+verify:ping () {
+  local url="${1:?}/ping"
+  http "${url:?}"
+  if echo ${HTTP_BODY:?} | grep "I'm alive" &> /dev/null && [[ ${HTTP_STATUS:?} -eq 200 ]]; then
+    ok 'Ping endpoint'
+  else
+    fail 'Ping endpoint' "${url:?}" "${HTTP_STATUS}" "${HTTP_BODY}"
+  fi
+}
+
+verify:health () {
+  local url="${1:?}/health"
+  http "${url:?}"
+  if [[ "$(echo ${HTTP_BODY:?} | jq -r '.status')" == 'OK' ]] && [[ ${HTTP_STATUS:?} -eq 200 ]]; then
+    ok 'Health endpoint'
+  else
+    fail 'Health endpoint' "${url:?}" "${HTTP_STATUS}" "${HTTP_BODY}"
+  fi
+}
+
+verify:notfound_handling () {
+  local url="${1:?}/not-found-address"
+  http "${url:?}"
+  if [[ "$(echo ${HTTP_BODY:?} | jq -r '.error.message')" == 'Not Found' ]] && [[ ${HTTP_STATUS:?} -eq 404 ]]; then
+    ok '404 handling'
+  else
+    fail '404 handling' "${url:?}" "${HTTP_STATUS}" "${HTTP_BODY}"
+  fi
+}
+
+verify:error_handling () {
+  local url="${1:?}/error"
+  http "${url:?}"
+  if [[ ${HTTP_STATUS:?} -ne 404 ]]; then
+    if [[ "$(echo ${HTTP_BODY:?} | jq -r '.error.message')" == 'Error' ]] && [[ ${HTTP_STATUS:?} -eq 500 ]]; then
+      ok 'Error handling'
+    else
+      fail 'Error handling' "${url:?}" "${HTTP_STATUS}" "${HTTP_BODY}"
+    fi
+  else
+    skip 'Error handling'
+  fi
+}
+
+verify:response_handling () {
+  local url="${1:?}/hello"
+  http "${url:?}"
+  if [[ ${HTTP_STATUS:?} -ne 404 ]]; then
+    if [[ "$(echo ${HTTP_BODY:?} | jq -r '.data')" != '' ]] && [[ ${HTTP_STATUS:?} -eq 200 ]]; then
+      ok 'Response handling'
+    else
+      fail 'Response handling' "${url:?}" "${HTTP_STATUS}" "${HTTP_BODY}"
+    fi
+  else
+    skip 'Response handling'
+  fi
+}
+
+verify:enhanced_by () {
+  local url="${1:?}/"
+  local response
+  response="$(curl -s -v "${url:?}" 2>&1)"
+  if echo ${response:?} | grep 'X-Ehanced-By: express-nemo-bootstrap' &> /dev/null; then
+    ok 'X-Ehanced-By header'
+  else
+    fail 'X-Ehanced-By header' "${url:?}"
+  fi
+}
+
+main () {
+  echo "Verifying api compliance"
+  echo
+
+  verify:enhanced_by "$@"
+  verify:ping "$@"
+  verify:health "$@"
+  verify:notfound_handling "$@"
+  verify:error_handling "$@"
+  verify:response_handling "$@"
+}
+
+main "$@"

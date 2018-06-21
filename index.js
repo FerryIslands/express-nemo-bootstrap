@@ -1,60 +1,52 @@
-const expressHttpContextCorrelationId = require('express-nemo-correlation-id')
-const expressHttpContextLogger = require('express-nemo-logger')
-const expressHttpContextRequestResponseLogger = require('express-nemo-request-response-logger')
-const expressHttpContextPerformace = require('express-nemo-performance')
-const expressHttpContextErrorResponse = require('express-nemo-error-response')
-const expressHttpContextErrorLogger = require('express-nemo-error-logger')
-const expressHttpNotFoundRoute = require('express-nemo-route-not-found')
-const expressHttpPingRoute = require('express-nemo-route-ping')
-const expressHttpHealthRoute = require('express-nemo-route-health')
+const express = require('express')
+const Logger = require('./logger')
 
-const performaceMonitor = expressHttpContextPerformace()
-
-const enhancedBy = (req, res, next) => {
-  res.set('X-Ehanced-By', 'TM-Express')
-  next()
+const defaultOptions = {
+  basePath: '/'
 }
 
-const defaults = {
-  application: 'TM-Express-App'
-}
+const expressNemo = options => {
+  options = { ...defaultOptions, ...options }
 
-module.exports = options => {
-  options = { ...defaults, ...options }
+  const middlewares = require('./middlewares')(options)
 
-  const loggerFactory = require('./logger-factory')(options)
-  const logEventFactory = require('./log-event-factory')(options)
-  const responseFactory = require('./response-factory')(options)
+  const PORT = process.env.PORT || 4000
+  const logger = new Logger({
+    context: {
+      origin: {
+        name: options.application
+      }
+    }
+  })
 
   return {
-    pre: [
-      enhancedBy,
-      performaceMonitor.start,
-      expressHttpContextCorrelationId(),
-      expressHttpContextLogger({ loggerFactory })
-    ],
+    options: options,
+    middlewares: middlewares,
 
-    ping: expressHttpPingRoute({
-      responseTemplate: responseFactory.pingResponse
-    }),
+    serve: async bootstrap => {
+      const nemoApp = express()
+      nemoApp.use(middlewares.pre)
 
-    health: expressHttpHealthRoute({
-      responseTemplate: responseFactory.healthResponse,
-      checks: options.healthchecks
-    }),
+      const routedApp = express()
+      routedApp
+        .get('/ping', middlewares.ping)
+        .get('/health', middlewares.health)
 
-    post: [
-      expressHttpNotFoundRoute(responseFactory.notFoundResponse),
-      performaceMonitor.end,
-      expressHttpContextErrorLogger({
-        eventTemplate: logEventFactory.createErrorLogEvent
-      }),
-      expressHttpContextErrorResponse({
-        errorMessageTemplate: responseFactory.errorResponseTemplate
-      }),
-      expressHttpContextRequestResponseLogger({
-        logEventFactory: logEventFactory.createRequestResponseLogEvent
+      await bootstrap(routedApp, middlewares)
+
+      nemoApp.use(options.basePath, routedApp).use(middlewares.post)
+
+      const server = nemoApp.listen(PORT, () =>
+        logger.info(`Server is now running on port ${PORT}`)
+      )
+
+      process.on('SIGTERM', () => {
+        server.close(() => logger.info(`Shutting down server...`))
       })
-    ]
+    }
   }
 }
+
+expressNemo.express = express
+
+module.exports = expressNemo
