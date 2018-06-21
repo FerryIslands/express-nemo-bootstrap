@@ -59,7 +59,7 @@ verify:error_handling () {
   local url="${1:?}/error"
   http "${url:?}"
   if [[ ${HTTP_STATUS:?} -ne 404 ]]; then
-    if [[ "$(echo ${HTTP_BODY:?} | jq -r '.error.message')" == 'Unhandled error' ]] && [[ ${HTTP_STATUS:?} -eq 500 ]]; then
+    if [[ "$(echo ${HTTP_BODY:?} | jq -r '.error.message')" == 'Error' ]] && [[ ${HTTP_STATUS:?} -eq 500 ]]; then
       ok 'Error handling'
     else
       fail 'Error handling' "${url:?}" "${HTTP_STATUS}" "${HTTP_BODY}"
