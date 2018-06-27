@@ -95,7 +95,8 @@ module.exports = options => {
       expressHttpNotFoundRoute(responseFactory.notFoundResponse),
       performaceMonitor.end,
       expressHttpContextErrorLogger({
-        eventTemplate: logEventFactory.createErrorLogEvent
+        eventTemplate: logEventFactory.createErrorLogEvent,
+        excludeErrors: ['UnauthorizedError']
       }),
       expressHttpContextErrorResponse({
         errorMessageTemplate: responseFactory.errorResponseTemplate
