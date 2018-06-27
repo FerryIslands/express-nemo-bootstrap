@@ -6,7 +6,7 @@ module.exports = options => {
     let requestData = {}
     if (req && req.context) {
       requestData = {
-        context: { tracing: req.context.tracing }
+        context: { tracing: { correlation_id: req.context.correlationId } }
       }
     }
 
