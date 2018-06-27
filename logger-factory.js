@@ -3,6 +3,13 @@ const extend = require('deep-extend')
 
 module.exports = options => {
   const createLogger = (req, res) => {
+    let requestData = {}
+    if (req && req.context) {
+      requestData = {
+        context: { tracing: req.context.tracing }
+      }
+    }
+
     return new Logger(
       extend(
         {},
@@ -13,9 +20,7 @@ module.exports = options => {
             }
           }
         },
-        {
-          context: req.context
-        }
+        requestData
       )
     )
   }

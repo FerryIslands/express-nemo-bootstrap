@@ -48,13 +48,7 @@ module.exports = options => {
   const logEventFactory = require('./log-event-factory')(options)
   const responseFactory = require('./response-factory')(options)
 
-  const logger = new Logger({
-    context: {
-      origin: {
-        name: options.application
-      }
-    }
-  })
+  const logger = loggerFactory()
 
   if (corsEnabled()) {
     logger.info('CORS enabled (environment variable ALLOW_CORS is set to true)')
