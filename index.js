@@ -48,5 +48,6 @@ const expressNemo = options => {
 }
 
 expressNemo.express = express
+expressNemo.Logger = Logger
 
 module.exports = expressNemo
