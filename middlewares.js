@@ -11,10 +11,12 @@ const expressHttpNotFoundRoute = require('express-nemo-route-not-found')
 const expressHttpPingRoute = require('express-nemo-route-ping')
 const expressHttpHealthRoute = require('express-nemo-route-health')
 
+const { version } = require('./package.json')
+
 const performaceMonitor = expressHttpContextPerformace()
 
 const enhancedBy = (req, res, next) => {
-  res.set('X-Ehanced-By', 'express-nemo-bootstrap')
+  res.set('X-Ehanced-By', `express-nemo-bootstrap v.${version}`)
   next()
 }
 
@@ -48,6 +50,8 @@ module.exports = options => {
   const responseFactory = require('./response-factory')(options)
 
   const logger = loggerFactory()
+
+  logger.info(`Using express-nemo-bootstrap v.${version}`)
 
   if (corsEnabled()) {
     logger.info('CORS enabled (environment variable ALLOW_CORS is set to true)')
