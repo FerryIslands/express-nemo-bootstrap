@@ -12,7 +12,6 @@ const expressHttpPingRoute = require('express-nemo-route-ping')
 const expressHttpHealthRoute = require('express-nemo-route-health')
 
 const performaceMonitor = expressHttpContextPerformace()
-const Logger = require('./logger')
 
 const enhancedBy = (req, res, next) => {
   res.set('X-Ehanced-By', 'express-nemo-bootstrap')
