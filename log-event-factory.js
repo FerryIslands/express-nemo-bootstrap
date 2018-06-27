@@ -12,7 +12,7 @@ const buildLogEvent = (req, le) => {
     context: {
       origin: {},
       tracing: {
-        correlationId
+        correlation_id: correlationId
       }
     },
     event: {},
