@@ -54,7 +54,7 @@ const createRequestResponseLogEvent = (req, res) => {
           path: url.pathname,
           host: url.hostname,
           port: url.port,
-          query_string: url.search
+          query_string: req.method === 'POST' ? req.body : url.search
         },
         response: {
           direction: 'outgoing',
