@@ -1,6 +1,6 @@
 {
   "name": "express-nemo-bootstrap",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "TM bootstrapper for the express-nemo suite",
   "main": "index.js",
   "license": "MIT",
