@@ -1,8 +1,15 @@
 const express = require('express')
 const Logger = require('./logger')
+const Sentry = require('@sentry/node')
 
 const defaultOptions = {
   basePath: '/'
+}
+
+const captureException = (error) => {
+  if (process.env.SENTRY_DSN) {
+    Sentry.captureException(error)
+  }
 }
 
 const expressNemo = options => {
@@ -49,5 +56,6 @@ const expressNemo = options => {
 
 expressNemo.express = express
 expressNemo.Logger = Logger
+expressNemo.captureException = captureException
 
 module.exports = expressNemo
