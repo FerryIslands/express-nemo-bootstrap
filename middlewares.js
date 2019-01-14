@@ -1,3 +1,4 @@
+const Sentry = require('@sentry/node')
 const cors = require('cors')
 const jwksRsa = require('jwks-rsa')
 const expressHttpContextAuth0JwtVerify = require('express-nemo-auth0-jwt-verify')
@@ -50,8 +51,6 @@ const applicationInsightsIf = (req, res, next) => {
 }
 
 if (process.env.SENTRY_DSN) {
-  const Sentry = require('@sentry/node')
-
   Sentry.init({
     dsn: process.env.SENTRY_DSN,
     environment: process.env.SENTRY_ENVIRONMENT
@@ -60,7 +59,6 @@ if (process.env.SENTRY_DSN) {
 
 const sentryPre = (req, res, next) => {
   if (process.env.SENTRY_DSN) {
-    const Sentry = require('@sentry/node')
     let requestHandler = Sentry.Handlers.requestHandler()
     return requestHandler(req, res, next)
   }
@@ -69,7 +67,6 @@ const sentryPre = (req, res, next) => {
 
 const sentryError = (error, req, res, next) => {
   if (process.env.SENTRY_DSN) {
-    const Sentry = require('@sentry/node')
     let errorHandler = Sentry.Handlers.errorHandler()
     return errorHandler(error, req, res, next)
   }
