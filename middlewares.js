@@ -38,6 +38,44 @@ const corsIf = (req, res, next) => {
   next(nextError)
 }
 
+const applicationInsightsIf = (req, res, next) => {
+  if (process.env.AI_INSTRUMENTATION_KEY) {
+    const appInsights = require('applicationinsights')
+
+    appInsights.setup(process.env.AI_INSTRUMENTATION_KEY).setAutoCollectExceptions(false)
+    appInsights.defaultClient.context.tags[appInsights.defaultClient.context.keys.cloudRole] = 'tm-internal-api'
+    appInsights.start()
+  }
+  next()
+}
+
+if (process.env.SENTRY_DSN) {
+  const Sentry = require('@sentry/node')
+
+  Sentry.init({
+    dsn: process.env.SENTRY_DSN,
+    environment: process.env.SENTRY_ENVIRONMENT
+  })
+}
+
+const sentryPre = (req, res, next) => {
+  if (process.env.SENTRY_DSN) {
+    const Sentry = require('@sentry/node')
+    let requestHandler = Sentry.Handlers.requestHandler()
+    return requestHandler(req, res, next)
+  }
+  return next()
+}
+
+const sentryError = (error, req, res, next) => {
+  if (process.env.SENTRY_DSN) {
+    const Sentry = require('@sentry/node')
+    let errorHandler = Sentry.Handlers.errorHandler()
+    return errorHandler(error, req, res, next)
+  }
+  return next(error)
+}
+
 const defaults = {
   application: 'tm-express-app'
 }
@@ -57,8 +95,18 @@ module.exports = options => {
     logger.info('CORS enabled (environment variable ALLOW_CORS is set to true)')
   }
 
+  if (process.env.SENTRY_DSN) {
+    logger.info('Sentry enabled')
+  }
+
+  if (process.env.AI_INSTRUMENTATION_KEY) {
+    logger.info('Application Insights enabled')
+  }
+
   return {
     pre: [
+      sentryPre,
+      applicationInsightsIf,
       enhancedBy,
       performaceMonitor.start,
       corsIf,
@@ -95,6 +143,7 @@ module.exports = options => {
     }),
 
     post: [
+      sentryError,
       expressHttpNotFoundRoute(responseFactory.notFoundResponse),
       performaceMonitor.end,
       expressHttpContextErrorLogger({
