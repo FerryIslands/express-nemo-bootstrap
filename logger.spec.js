@@ -19,7 +19,7 @@ describe('logger.js', () => {
   })
 
   const captureConsole = (method, cb) => {
-    const sandbox = sinon.sandbox.create()
+    const sandbox = sinon.createSandbox()
     const consoleStub = sandbox.stub(console, method)
     cb()
     const captured = consoleStub.getCall(0).args[0]
