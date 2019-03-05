@@ -39,15 +39,19 @@ const corsIf = (req, res, next) => {
   next(nextError)
 }
 
-const applicationInsightsIf = (req, res, next) => {
-  if (process.env.AI_INSTRUMENTATION_KEY) {
-    const appInsights = require('applicationinsights')
+const applicationInsightsIf = (options) => {
+  const appInsightsIf = (_req, _res, next) => {
+    if (process.env.AI_INSTRUMENTATION_KEY) {
+      const appInsights = require('applicationinsights')
 
-    appInsights.setup(process.env.AI_INSTRUMENTATION_KEY).setAutoCollectExceptions(false)
-    appInsights.defaultClient.context.tags[appInsights.defaultClient.context.keys.cloudRole] = 'tm-internal-api'
-    appInsights.start()
+      appInsights.setup(process.env.AI_INSTRUMENTATION_KEY).setAutoCollectExceptions(false)
+      appInsights.defaultClient.context.tags[appInsights.defaultClient.context.keys.cloudRole] = options.application
+      appInsights.start()
+    }
+    next()
   }
-  next()
+
+  return appInsightsIf
 }
 
 if (process.env.SENTRY_DSN) {
@@ -103,7 +107,7 @@ module.exports = options => {
   return {
     pre: [
       sentryPre,
-      applicationInsightsIf,
+      applicationInsightsIf(options),
       enhancedBy,
       performaceMonitor.start,
       corsIf,
