@@ -75,6 +75,8 @@ const sentryError = (error, req, res, next) => {
       const [_provider, _providerLocation, email] = req.user.sub.split('|')
       if (email) {
         Sentry.configureScope(scope => scope.setUser({ email }))
+      } else {
+        Sentry.configureScope(scope => scope.setUser({ id: req.user.sub }))
       }
     }
 
