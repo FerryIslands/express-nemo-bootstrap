@@ -71,6 +71,13 @@ const sentryPre = (req, res, next) => {
 
 const sentryError = (error, req, res, next) => {
   if (process.env.SENTRY_DSN) {
+    if (req.user && req.user.sub) {
+      const [_provider, _providerLocation, email] = req.user.sub.split('|')
+      if (email) {
+        Sentry.configureScope(scope => scope.setUser({ email }))
+      }
+    }
+
     let errorHandler = Sentry.Handlers.errorHandler()
     return errorHandler(error, req, res, next)
   }
