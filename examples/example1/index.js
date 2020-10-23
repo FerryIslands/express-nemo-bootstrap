@@ -11,7 +11,9 @@ const helloRoute = (req, res, next) => {
 }
 
 const errorRoute = (req, res, next) => {
-  throw new Error('Bad, bad, boys, come with me, come with me')
+  const err = new Error('Bad, bad, boys, come with me, come with me')
+  err.status = 400
+  throw err
 }
 
 nemo({
@@ -29,5 +31,15 @@ nemo({
         return 'OK'
       }
     }
-  ]
+  ],
+  injectable: {
+    beforePost: [(error, req, res, next) => {
+      if (error && error.status) {
+        console.log(error.message)
+        res.status(error.status)
+        res.send(error.message)
+        next()
+      }
+    }]
+  }
 }).serve(server => server.get('/hello', helloRoute).get('/error', errorRoute))
