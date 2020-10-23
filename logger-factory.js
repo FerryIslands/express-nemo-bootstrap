@@ -2,7 +2,7 @@ const Logger = require('./logger')
 const extend = require('deep-extend')
 
 module.exports = options => {
-  const createLogger = (req, res) => {
+  const createLogger = (req) => {
     let requestData = {}
     if (req && req.context) {
       requestData = {

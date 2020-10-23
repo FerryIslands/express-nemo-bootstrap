@@ -63,7 +63,7 @@ if (process.env.SENTRY_DSN) {
 
 const sentryPre = (req, res, next) => {
   if (process.env.SENTRY_DSN) {
-    let requestHandler = Sentry.Handlers.requestHandler()
+    const requestHandler = Sentry.Handlers.requestHandler()
     return requestHandler(req, res, next)
   }
   return next()
@@ -80,7 +80,7 @@ const sentryError = (error, req, res, next) => {
       }
     }
 
-    let errorHandler = Sentry.Handlers.errorHandler()
+    const errorHandler = Sentry.Handlers.errorHandler()
     return errorHandler(error, req, res, next)
   }
   return next(error)
@@ -133,12 +133,12 @@ module.exports = options => {
           cache: true,
           rateLimit: true,
           jwksRequestsPerMinute: 5,
-          jwksUri: `https://nem0.eu.auth0.com/.well-known/jwks.json`
+          jwksUri: 'https://nem0.eu.auth0.com/.well-known/jwks.json'
         }),
 
         // Validate the audience and the issuer.
         audience: 'https://nemo.stena.io/api',
-        issuer: `https://nem0.eu.auth0.com/`,
+        issuer: 'https://nem0.eu.auth0.com/',
         algorithms: ['RS256']
       }
     }),

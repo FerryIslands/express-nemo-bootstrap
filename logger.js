@@ -39,7 +39,7 @@ const log = (data, level, context) => {
   }
 
   if (!loggingDisabled()) {
-    let msg = JSON.stringify(structureMessage)
+    const msg = JSON.stringify(structureMessage)
     switch (level) {
       case 'debug':
       case 'info':

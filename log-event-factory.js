@@ -82,7 +82,7 @@ const createErrorLogEvent = (err, req) => {
   })
 }
 
-module.exports = options => {
+module.exports = () => {
   return {
     createRequestResponseLogEvent,
     createErrorLogEvent
