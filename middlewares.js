@@ -61,9 +61,20 @@ if (process.env.SENTRY_DSN) {
   })
 }
 
+const configureSentry = (req) => {
+  if (req.user && req.user.sub) {
+    const [_provider, _providerLocation, email] = req.user.sub.split('|')
+    if (email) {
+      Sentry.configureScope(scope => scope.setUser({ email }))
+    } else {
+      Sentry.configureScope(scope => scope.setUser({ id: req.user.sub }))
+    }
+  }
+}
+
 const sentryPre = (req, res, next) => {
   if (process.env.SENTRY_DSN) {
-    let requestHandler = Sentry.Handlers.requestHandler()
+    const requestHandler = Sentry.Handlers.requestHandler()
     return requestHandler(req, res, next)
   }
   return next()
@@ -71,16 +82,7 @@ const sentryPre = (req, res, next) => {
 
 const sentryError = (error, req, res, next) => {
   if (process.env.SENTRY_DSN) {
-    if (req.user && req.user.sub) {
-      const [_provider, _providerLocation, email] = req.user.sub.split('|')
-      if (email) {
-        Sentry.configureScope(scope => scope.setUser({ email }))
-      } else {
-        Sentry.configureScope(scope => scope.setUser({ id: req.user.sub }))
-      }
-    }
-
-    let errorHandler = Sentry.Handlers.errorHandler()
+    const errorHandler = Sentry.Handlers.errorHandler()
     return errorHandler(error, req, res, next)
   }
   return next(error)
@@ -105,6 +107,34 @@ module.exports = options => {
     logger.info('CORS enabled (environment variable ALLOW_CORS is set to true)')
   }
 
+  const auth = expressHttpContextAuth0JwtVerify({
+    jwt: {
+      // Dynamically provide a signing key
+      // based on the kid in the header and
+      // the signing keys provided by the JWKS endpoint.
+      secret: jwksRsa.expressJwtSecret({
+        cache: true,
+        rateLimit: true,
+        jwksRequestsPerMinute: 5,
+        jwksUri: 'https://nem0.eu.auth0.com/.well-known/jwks.json'
+      }),
+
+      // Validate the audience and the issuer.
+      audience: 'https://nemo.stena.io/api',
+      issuer: 'https://nem0.eu.auth0.com/',
+      algorithms: ['RS256']
+    }
+  })
+
+  const authThenConfigureSentry = (req, res, next) => {
+    const wrappedNext = err => {
+      configureSentry(req)
+      next(err)
+    }
+
+    auth(req, res, wrappedNext)
+  }
+
   if (process.env.SENTRY_DSN) {
     logger.info('Sentry enabled')
   }
@@ -124,24 +154,7 @@ module.exports = options => {
       expressHttpContextLogger({ loggerFactory })
     ],
 
-    auth: expressHttpContextAuth0JwtVerify({
-      jwt: {
-        // Dynamically provide a signing key
-        // based on the kid in the header and
-        // the signing keys provided by the JWKS endpoint.
-        secret: jwksRsa.expressJwtSecret({
-          cache: true,
-          rateLimit: true,
-          jwksRequestsPerMinute: 5,
-          jwksUri: `https://nem0.eu.auth0.com/.well-known/jwks.json`
-        }),
-
-        // Validate the audience and the issuer.
-        audience: 'https://nemo.stena.io/api',
-        issuer: `https://nem0.eu.auth0.com/`,
-        algorithms: ['RS256']
-      }
-    }),
+    auth: process.env.SENTRY_DSN ? authThenConfigureSentry : auth,
 
     ping: expressHttpPingRoute({
       responseTemplate: responseFactory.pingResponse
