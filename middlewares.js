@@ -12,6 +12,9 @@ const expressHttpNotFoundRoute = require('express-nemo-route-not-found')
 const expressHttpPingRoute = require('express-nemo-route-ping')
 const expressHttpHealthRoute = require('express-nemo-route-health')
 
+const appInsights = require('./appInsights/appInsights')
+const extend = require('deep-extend')
+
 const { version } = require('./package.json')
 
 const performaceMonitor = expressHttpContextPerformace()
@@ -37,21 +40,6 @@ const corsIf = (req, res, next) => {
   }
 
   next(nextError)
-}
-
-const applicationInsightsIf = (options) => {
-  const appInsightsIf = (_req, _res, next) => {
-    if (process.env.AI_INSTRUMENTATION_KEY) {
-      const appInsights = require('applicationinsights')
-
-      appInsights.setup(process.env.AI_INSTRUMENTATION_KEY).setAutoCollectExceptions(false)
-      appInsights.defaultClient.context.tags[appInsights.defaultClient.context.keys.cloudRole] = options.application
-      appInsights.start()
-    }
-    next()
-  }
-
-  return appInsightsIf
 }
 
 if (process.env.SENTRY_DSN) {
@@ -89,11 +77,14 @@ const sentryError = (error, req, res, next) => {
 }
 
 const defaults = {
-  application: 'tm-express-app'
+  application: 'tm-express-app',
+  ...appInsights.defaultConfig
 }
 
 module.exports = options => {
-  options = { ...defaults, ...options }
+  options = extend({}, defaults, options)
+
+  appInsights.useDefaultApplicationNameIfNotOverridden(options.application, options.appInsightsConfig)
 
   const loggerFactory = require('./logger-factory')(options)
   const logEventFactory = require('./log-event-factory')(options)
@@ -102,6 +93,11 @@ module.exports = options => {
   const logger = loggerFactory()
 
   logger.info(`Using express-nemo-bootstrap v.${version}`)
+
+  if (process.env.AI_INSTRUMENTATION_KEY) {
+    options.appInsights = appInsights.initAndStart(process.env.AI_INSTRUMENTATION_KEY, options.appInsightsConfig)
+    logger.info('Application Insights enabled')
+  }
 
   if (corsEnabled()) {
     logger.info('CORS enabled (environment variable ALLOW_CORS is set to true)')
@@ -139,18 +135,17 @@ module.exports = options => {
     logger.info('Sentry enabled')
   }
 
-  if (process.env.AI_INSTRUMENTATION_KEY) {
-    logger.info('Application Insights enabled')
-  }
-
   return {
+    dependencies: {
+      appInsights
+    },
     pre: [
       sentryPre,
-      applicationInsightsIf(options),
       enhancedBy,
       performaceMonitor.start,
       corsIf,
       expressHttpContextCorrelationId(),
+      appInsights.extendReqContext(options),
       expressHttpContextLogger({ loggerFactory })
     ],
 
