@@ -2,6 +2,42 @@
 
 TM bootstrapper for the express-nemo suite
 
+## Update projects that dependends on nemo-express-bootstrap
+
+Run this scipt after you have tagged a new release with vX.Y.Z and pushed it with 'git push --tags'
+
+### Prereq
+
+You need to update script variables in the top of the script: update-projects-dependency.sh
+
+* newVersion='vX.Y.Z', set a valid version
+* featureId='SET PBI ITEM', set the PBI number taht we should reference
+* [optional] add/remove projects from 'projectWithNemoBootstrap' dont forget to add/remove corresponding item index in 'projectPackageManager'
+
+### Run it
+
+````bash
+express-nemo-bootstrap>
+
+./update-projects-dependency.sh
+````
+
+### What will the script do
+
+It will create pull requests with the new version of express-nemo-bootstrap based on each projects master branch.
+
+Projects that will be affected:
+
+* tm-internal-api
+* tm-capacity-api-v2
+* tm-nemo-api
+* tm-price-api
+* tm-competitor-price-api
+* tm-task-api
+* tm-monetary-api
+
+At the end it will output links to all created pull requests
+
 ## Application Insights
 
 Setting up Appplication Insights in express-nemo-bootstrap
