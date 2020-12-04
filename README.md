@@ -8,6 +8,14 @@ Run this scipt after you have tagged a new release with vX.Y.Z and pushed it wit
 
 ### Prereq
 
+This script requires these binaries
+
+````bash
+  brew install node@14
+  brew install hub
+  brew install jq
+````
+
 You need to update script variables in the top of the script: update-projects-dependency.sh
 
 * newVersion='vX.Y.Z', set a valid version
