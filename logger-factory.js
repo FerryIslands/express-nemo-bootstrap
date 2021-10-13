@@ -1,5 +1,6 @@
 const Logger = require('./logger')
-const extend = require('deep-extend')
+const {merge: extend} = require('lodash')
+
 
 module.exports = options => {
   const createLogger = (req, res) => {

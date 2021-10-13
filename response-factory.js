@@ -22,7 +22,7 @@ module.exports = options => {
   const errorResponseTemplate = (err, req, res) => {
     const statusCode = res.statusCode
     const statusMessage =
-      HttpStatus.getStatusText(statusCode) || HttpStatus.getStatusText(500)
+      HttpStatus.getReasonPhrase(statusCode) || HttpStatus.getReasonPhrase(500)
 
     let errorResponse = {
       error: {

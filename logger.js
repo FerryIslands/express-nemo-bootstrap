@@ -1,5 +1,5 @@
 const moment = require('moment')
-const extend = require('deep-extend')
+const {merge: extend} = require('lodash')
 
 const loggingDisabled = () => {
   return '' + process.env.LOGGING_DISABLED === 'true'

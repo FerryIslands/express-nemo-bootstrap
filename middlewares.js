@@ -12,8 +12,9 @@ const expressHttpNotFoundRoute = require('express-nemo-route-not-found')
 const expressHttpPingRoute = require('express-nemo-route-ping')
 const expressHttpHealthRoute = require('express-nemo-route-health')
 
+const { createEndHandler } = require('./endHandler.js')
 const appInsights = require('./appInsights/appInsights')
-const extend = require('deep-extend')
+const {merge: extend} = require('lodash')
 
 const { version } = require('./package.json')
 
@@ -135,6 +136,10 @@ module.exports = options => {
     logger.info('Sentry enabled')
   }
 
+  const requestResponseLogger = expressHttpContextRequestResponseLogger({
+    logEventFactory: logEventFactory.createRequestResponseLogEvent
+  })
+
   return {
     dependencies: {
       appInsights
@@ -146,7 +151,11 @@ module.exports = options => {
       corsIf,
       expressHttpContextCorrelationId(),
       appInsights.extendReqContext(options),
-      expressHttpContextLogger({ loggerFactory })
+      expressHttpContextLogger({ loggerFactory }),
+      createEndHandler(options,[
+        performaceMonitor.end,
+        requestResponseLogger
+      ])
     ],
 
     auth: process.env.SENTRY_DSN ? authThenConfigureSentry : auth,
@@ -161,9 +170,9 @@ module.exports = options => {
     }),
 
     post: [
-      sentryError,
+      performaceMonitor.error,
       expressHttpNotFoundRoute(responseFactory.notFoundResponse),
-      performaceMonitor.end,
+      sentryError,
       expressHttpContextErrorLogger({
         eventTemplate: logEventFactory.createErrorLogEvent,
         excludeErrors: ['UnauthorizedError']
@@ -171,9 +180,6 @@ module.exports = options => {
       expressHttpContextErrorResponse({
         errorMessageTemplate: responseFactory.errorResponseTemplate
       }),
-      expressHttpContextRequestResponseLogger({
-        logEventFactory: logEventFactory.createRequestResponseLogEvent
-      })
     ]
   }
 }
