@@ -1,9 +1,8 @@
 const Logger = require('./logger')
-const {merge: extend} = require('lodash')
-
+const { merge: extend } = require('lodash')
 
 module.exports = options => {
-  const createLogger = (req, res) => {
+  const createLogger = (req, _res) => {
     let requestData = {}
     if (req && req.context) {
       requestData = {

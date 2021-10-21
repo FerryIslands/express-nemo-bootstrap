@@ -14,7 +14,7 @@ const expressHttpHealthRoute = require('express-nemo-route-health')
 
 const { createEndHandler } = require('./endHandler.js')
 const appInsights = require('./appInsights/appInsights')
-const {merge: extend} = require('lodash')
+const { merge: extend } = require('lodash')
 
 const { version } = require('./package.json')
 
@@ -52,6 +52,7 @@ if (process.env.SENTRY_DSN) {
 
 const configureSentry = (req) => {
   if (req.user && req.user.sub) {
+    // eslint-disable-next-line no-unused-vars
     const [_provider, _providerLocation, email] = req.user.sub.split('|')
     if (email) {
       Sentry.configureScope(scope => scope.setUser({ email }))
@@ -152,7 +153,7 @@ module.exports = options => {
       expressHttpContextCorrelationId(),
       appInsights.extendReqContext(options),
       expressHttpContextLogger({ loggerFactory }),
-      createEndHandler(options,[
+      createEndHandler(options, [
         performaceMonitor.end,
         requestResponseLogger
       ])
@@ -179,7 +180,7 @@ module.exports = options => {
       }),
       expressHttpContextErrorResponse({
         errorMessageTemplate: responseFactory.errorResponseTemplate
-      }),
+      })
     ]
   }
 }

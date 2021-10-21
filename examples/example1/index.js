@@ -10,7 +10,7 @@ const helloRoute = (req, res, next) => {
   next()
 }
 
-const errorRoute = (req, res, next) => {
+const errorRoute = (_req, _res, _next) => {
   throw new Error('Bad, bad, boys, come with me, come with me')
 }
 

@@ -14,12 +14,12 @@ const createEndHandler = (options, middlewares) => {
       }
     })
 
-    next();
+    next()
   }
 
-  return endHandler;
+  return endHandler
 }
 
 module.exports = {
-  createEndHandler,
+  createEndHandler
 }

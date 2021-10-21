@@ -9,7 +9,8 @@
   "scripts": {
     "test": "mocha './{,!(node_modules)/**/}*.spec.js' --reporter spec --slow 10",
     "test:watch": "mocha './{,!(node_modules)/**/}*.spec.js' --reporter spec --watch --slow 10",
-    "lint": "eslint --ext .js ."
+    "lint": "eslint --ext .js .",
+    "lint-fix": "eslint --fix --ext .js ."
   },
   "dependencies": {
     "@sentry/node": "^6.13.3",
