@@ -10,7 +10,7 @@ const createEndHandler = (options, middlewares) => {
       }
 
       for (let i = 0; i < middlewares.length; i++) {
-        middlewares[i](req,res, () => {})
+        middlewares[i](req, res, () => {})
       }
     })
 
