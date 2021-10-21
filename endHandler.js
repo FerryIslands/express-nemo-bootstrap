@@ -5,7 +5,7 @@ const createEndHandler = (options, middlewares) => {
     }
 
     req.on('end', () => {
-      if(!middlewares) {
+      if (!middlewares) {
         console.log('Did you forget to put end handlers!')
       }
 
