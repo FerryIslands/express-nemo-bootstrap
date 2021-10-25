@@ -33,7 +33,7 @@ describe('logger.js', () => {
       logger.debug(message)
     })
 
-    let momentTimestamp = moment(json.timestamp, moment.ISO_8601, true)
+    const momentTimestamp = moment(json.timestamp, moment.ISO_8601, true)
     expect(momentTimestamp.isValid()).to.equal(true)
     expect(json.level).to.equal('debug')
     expect(json.message).to.equal(message)
@@ -48,7 +48,7 @@ describe('logger.js', () => {
       logger.info(message)
     })
 
-    let momentTimestamp = moment(json.timestamp, moment.ISO_8601, true)
+    const momentTimestamp = moment(json.timestamp, moment.ISO_8601, true)
     expect(momentTimestamp.isValid()).to.equal(true)
     expect(json.level).to.equal('info')
     expect(json.message).to.equal(message)
@@ -63,7 +63,7 @@ describe('logger.js', () => {
       logger.warn(message)
     })
 
-    let momentTimestamp = moment(json.timestamp, moment.ISO_8601, true)
+    const momentTimestamp = moment(json.timestamp, moment.ISO_8601, true)
     expect(momentTimestamp.isValid()).to.equal(true)
     expect(json.level).to.equal('warn')
     expect(json.message).to.equal(message)
@@ -78,7 +78,7 @@ describe('logger.js', () => {
       logger.error(message)
     })
 
-    let momentTimestamp = moment(json.timestamp, moment.ISO_8601, true)
+    const momentTimestamp = moment(json.timestamp, moment.ISO_8601, true)
     expect(momentTimestamp.isValid()).to.equal(true)
     expect(json.level).to.equal('error')
     expect(json.message).to.equal(message)
@@ -108,7 +108,7 @@ describe('logger.js', () => {
       })
 
       it('should log with timestamp', async () => {
-        let momentTimestamp = moment(result.timestamp, moment.ISO_8601, true)
+        const momentTimestamp = moment(result.timestamp, moment.ISO_8601, true)
         expect(momentTimestamp.isValid()).to.equal(true)
       })
 
@@ -147,7 +147,7 @@ describe('logger.js', () => {
       })
 
       it('should not allow override of timestamp', async () => {
-        let momentTimestamp = moment(result.timestamp, moment.ISO_8601, true)
+        const momentTimestamp = moment(result.timestamp, moment.ISO_8601, true)
         expect(momentTimestamp.isValid()).to.equal(true)
       })
 

@@ -48,7 +48,7 @@ const expressNemo = options => {
       )
 
       process.on('SIGTERM', () => {
-        server.close(() => logger.info(`Shutting down server...`))
+        server.close(() => logger.info('Shutting down server...'))
       })
     }
   }

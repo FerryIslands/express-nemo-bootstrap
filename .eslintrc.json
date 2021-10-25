@@ -1,8 +1,7 @@
 {
-  "plugins": ["standard"],
   "rules": {
     "jsx-quotes": ["error", "prefer-single"],
-    "no-unused-vars": ["error", { "varsIgnorePattern": "^_" }]
+    "no-unused-vars": ["error", { "argsIgnorePattern": "^_" }]
   },
-  "extends": ["standard"]
+  "extends": "standard"
 }

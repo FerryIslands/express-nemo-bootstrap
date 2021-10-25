@@ -3,7 +3,7 @@ const HttpStatus = require('http-status-codes')
 
 const debugEnabled = () => process.env.NODE_ENV === 'DEV'
 
-module.exports = options => {
+module.exports = _options => {
   const notFoundResponse = {
     notFoundResponseTemplate: (req, res) => {
       return {
@@ -22,9 +22,9 @@ module.exports = options => {
   const errorResponseTemplate = (err, req, res) => {
     const statusCode = res.statusCode
     const statusMessage =
-      HttpStatus.getStatusText(statusCode) || HttpStatus.getStatusText(500)
+      HttpStatus.getReasonPhrase(statusCode) || HttpStatus.getReasonPhrase(500)
 
-    let errorResponse = {
+    const errorResponse = {
       error: {
         type: err.name,
         message: 'Error',
@@ -46,13 +46,13 @@ module.exports = options => {
     return errorResponse
   }
 
-  const pingResponse = (req, res) => {
+  const pingResponse = (_req, _res) => {
     return {
       "I'm alive": moment().format()
     }
   }
 
-  const healthResponse = (results, req, res) => {
+  const healthResponse = (results, _req, _res) => {
     const allChecksPassed = results.every(result => result.status === 'OK')
 
     const systemInfo = {

@@ -1,5 +1,5 @@
 const moment = require('moment')
-const extend = require('deep-extend')
+const { merge: extend } = require('lodash')
 
 const loggingDisabled = () => {
   return '' + process.env.LOGGING_DISABLED === 'true'
@@ -39,7 +39,7 @@ const log = (data, level, context) => {
   }
 
   if (!loggingDisabled()) {
-    let msg = JSON.stringify(structureMessage)
+    const msg = JSON.stringify(structureMessage)
     switch (level) {
       case 'debug':
       case 'info':

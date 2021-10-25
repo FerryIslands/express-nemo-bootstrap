@@ -67,8 +67,15 @@ const createRequestResponseLogEvent = (req, res) => {
 }
 
 const createErrorLogEvent = (err, req) => {
+  const time =
+          req.context &&
+          req.context.performance &&
+          req.context.performance.timing
+            ? ` (time ${req.context.performance.timing.time} s.ms)`
+            : ''
+
   return buildLogEvent(req, {
-    message: `Unandled error: ${err.name}, ${err.message}`,
+    message: `Unandled error: ${err.name}, ${err.message}${time}`,
     event: {
       error: {
         type: err.name.toLowerCase(),
@@ -82,7 +89,7 @@ const createErrorLogEvent = (err, req) => {
   })
 }
 
-module.exports = options => {
+module.exports = _options => {
   return {
     createRequestResponseLogEvent,
     createErrorLogEvent
