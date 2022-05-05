@@ -5,6 +5,33 @@ const loggingDisabled = () => {
   return '' + process.env.LOGGING_DISABLED === 'true'
 }
 
+const debounceSeconds = () => {
+  return process.env.LOGGING_DEBOUNCE_SECONDS ?? 60
+}
+
+const filteredPaths = {
+  '/ping': {},
+  '/health': {}
+}
+
+const filterLogByPath = (structureMessage) => {
+  const path = structureMessage?.event?.http?.request?.path
+  const seconds = debounceSeconds()
+
+  if (path && filteredPaths[path]) {
+    if (seconds === 0) return false
+    if (seconds < 0) return true
+    const previouslyLoggedAt = filteredPaths[path].loggedAt
+    if (previouslyLoggedAt && Date.now() < previouslyLoggedAt.getTime()) {
+      return true
+    }
+    filteredPaths[path].loggedAt = new Date(Date.now() + (seconds * 1000))
+    return false
+  }
+
+  return false
+}
+
 const getDefaultStructure = () => {
   return {
     timestamp: moment().format(),
@@ -36,6 +63,10 @@ const log = (data, level, context) => {
       context: context
     })
     structureMessage = extend({}, defaultStructure, extendedData)
+  }
+
+  if (filterLogByPath(structureMessage)) {
+    return
   }
 
   if (!loggingDisabled()) {
