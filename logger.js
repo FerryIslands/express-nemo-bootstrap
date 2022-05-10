@@ -5,28 +5,19 @@ const loggingDisabled = () => {
   return '' + process.env.LOGGING_DISABLED === 'true'
 }
 
-const debounceSeconds = () => {
-  return process.env.LOGGING_DEBOUNCE_SECONDS ?? 60
-}
-
 const filteredPaths = {
-  '/ping': {},
-  '/health': {}
+  '/ping': {}
 }
 
 const filterLogByPath = (structureMessage) => {
   const path = structureMessage?.event?.http?.request?.path
-  const seconds = debounceSeconds()
+  const query = structureMessage?.event?.http?.request?.query_string
 
-  if (path && filteredPaths[path]) {
-    if (seconds === 0) return false
-    if (seconds < 0) return true
-    const previouslyLoggedAt = filteredPaths[path].loggedAt
-    if (previouslyLoggedAt && Date.now() < previouslyLoggedAt.getTime()) {
-      return true
-    }
-    filteredPaths[path].loggedAt = new Date(Date.now() + (seconds * 1000))
-    return false
+  console.log(query)
+  console.log(query?.includes('dontLogIt'))
+
+  if (path && filteredPaths[path] && query && query.includes('dontLogIt')) {
+    return true
   }
 
   return false
