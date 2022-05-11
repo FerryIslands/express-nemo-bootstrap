@@ -5,22 +5,24 @@ const loggingDisabled = () => {
   return '' + process.env.LOGGING_DISABLED === 'true'
 }
 
+const pingLoggingEnabled = () => {
+  return '' + process.env.LOGGING_PING_ENABLED === 'true'
+}
+
 const filteredPaths = {
   '/ping': {}
 }
 
-const filterLogByPath = (structureMessage) => {
+const pathShouldBeLogged = (structureMessage) => {
   const path = structureMessage?.event?.http?.request?.path
-  const query = structureMessage?.event?.http?.request?.query_string
 
-  console.log(query)
-  console.log(query?.includes('dontLogIt'))
+  if (pingLoggingEnabled()) return true
 
-  if (path && filteredPaths[path] && query && query.includes('dontLogIt')) {
-    return true
+  if (path && filteredPaths[path]) {
+    return false
   }
 
-  return false
+  return true
 }
 
 const getDefaultStructure = () => {
@@ -56,7 +58,7 @@ const log = (data, level, context) => {
     structureMessage = extend({}, defaultStructure, extendedData)
   }
 
-  if (filterLogByPath(structureMessage)) {
+  if (!pathShouldBeLogged(structureMessage)) {
     return
   }
 
