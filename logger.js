@@ -5,6 +5,26 @@ const loggingDisabled = () => {
   return '' + process.env.LOGGING_DISABLED === 'true'
 }
 
+const pingLoggingEnabled = () => {
+  return '' + process.env.LOGGING_PING_ENABLED === 'true'
+}
+
+const filteredPaths = {
+  '/ping': {}
+}
+
+const pathShouldBeLogged = (structureMessage) => {
+  const path = structureMessage?.event?.http?.request?.path
+
+  if (pingLoggingEnabled()) return true
+
+  if (path && filteredPaths[path]) {
+    return false
+  }
+
+  return true
+}
+
 const getDefaultStructure = () => {
   return {
     timestamp: moment().format(),
@@ -36,6 +56,10 @@ const log = (data, level, context) => {
       context: context
     })
     structureMessage = extend({}, defaultStructure, extendedData)
+  }
+
+  if (!pathShouldBeLogged(structureMessage)) {
+    return
   }
 
   if (!loggingDisabled()) {
