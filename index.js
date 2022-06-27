@@ -1,6 +1,7 @@
 const express = require('express')
 const Logger = require('./logger')
 const Sentry = require('@sentry/node')
+const { createServer } = require('http')
 
 const defaultOptions = {
   basePath: '/'
@@ -25,31 +26,55 @@ const expressNemo = options => {
       }
     }
   })
+  
+  const setupCommonApps = () => {
+    const nemoApp = express()
+    nemoApp.use(middlewares.pre)
+
+    const routedApp = express()
+    routedApp
+      .get('/ping', middlewares.ping)
+      .get('/health', middlewares.health)
+
+    return {
+      nemoApp: nemoApp,
+      routedApp: routedApp,
+    }
+  }
+  
+  const startApp = (listenServer) => {
+    const server = listenServer.listen(PORT, () =>
+      logger.info(`Server is now running on port ${PORT}`)
+    )
+
+    process.on('SIGTERM', () => {
+      server.close(() => logger.info('Shutting down server...'))
+    })
+  }
 
   return {
     options: options,
     middlewares: middlewares,
 
     serve: async bootstrap => {
-      const nemoApp = express()
-      nemoApp.use(middlewares.pre)
-
-      const routedApp = express()
-      routedApp
-        .get('/ping', middlewares.ping)
-        .get('/health', middlewares.health)
+      const {nemoApp, routedApp} = setupCommonApps();
 
       await bootstrap(routedApp, middlewares)
 
       nemoApp.use(options.basePath, routedApp).use(middlewares.post)
 
-      const server = nemoApp.listen(PORT, () =>
-        logger.info(`Server is now running on port ${PORT}`)
-      )
+      startApp(nemoApp)
+    },
+    serveWithHttpServer: async bootstrap => {
+      const {nemoApp, routedApp} = setupCommonApps();
 
-      process.on('SIGTERM', () => {
-        server.close(() => logger.info('Shutting down server...'))
-      })
+      const httpServer = createServer(nemoApp)
+
+      await bootstrap(routedApp, httpServer, middlewares)
+
+      nemoApp.use(options.basePath, routedApp).use(middlewares.post)
+
+      startApp(httpServer)
     }
   }
 }
