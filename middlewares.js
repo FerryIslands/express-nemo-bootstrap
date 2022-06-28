@@ -17,6 +17,7 @@ const appInsights = require('./appInsights/appInsights')
 const { merge: extend } = require('lodash')
 
 const { version } = require('./package.json')
+const { jwksOptions, validationOptions } = require('./authenticationOptions')
 
 const performaceMonitor = expressHttpContextPerformace()
 
@@ -110,17 +111,8 @@ module.exports = options => {
       // Dynamically provide a signing key
       // based on the kid in the header and
       // the signing keys provided by the JWKS endpoint.
-      secret: jwksRsa.expressJwtSecret({
-        cache: true,
-        rateLimit: true,
-        jwksRequestsPerMinute: 5,
-        jwksUri: 'https://nem0.eu.auth0.com/.well-known/jwks.json'
-      }),
-
-      // Validate the audience and the issuer.
-      audience: 'https://nemo.stena.io/api',
-      issuer: 'https://nem0.eu.auth0.com/',
-      algorithms: ['RS256']
+      secret: jwksRsa.expressJwtSecret(jwksOptions),
+      ...validationOptions
     }
   })
 

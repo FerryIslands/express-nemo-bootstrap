@@ -2,6 +2,7 @@ const express = require('express')
 const Logger = require('./logger')
 const Sentry = require('@sentry/node')
 const { createServer } = require('http')
+const { authenticate } = require('./authentication')
 
 const defaultOptions = {
   basePath: '/'
@@ -82,5 +83,6 @@ const expressNemo = options => {
 expressNemo.express = express
 expressNemo.Logger = Logger
 expressNemo.captureException = captureException
+expressNemo.authenticate = authenticate
 
 module.exports = expressNemo
