@@ -1,6 +1,6 @@
-const jwksRsa = require('jwks-rsa')
 const jwt = require('jsonwebtoken')
 const { jwksOptions, validationOptions } = require('./authenticationOptions')
+const { JwksClient } = require('jwks-rsa')
 
 async function authenticate(authorization){
   if(typeof  authorization !== 'string') {
@@ -31,9 +31,9 @@ async function authenticate(authorization){
     throw new Error('Could not decode jwt, check if token is correct');
   }
   
-  const client = new jwksRsa.JwksClient(jwksOptions);
+  const client = new JwksClient(jwksOptions);
 
-  const key = await client.getSigningKeyAsync(header.kid);
+  const key = await client.getSigningKey(header.kid);
   
   const publicKey = key.publicKey || key.rsaPublicKey;
   
