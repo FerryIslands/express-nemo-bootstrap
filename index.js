@@ -27,7 +27,7 @@ const expressNemo = options => {
       }
     }
   })
-  
+
   const setupCommonApps = () => {
     const nemoApp = express()
     nemoApp.use(middlewares.pre)
@@ -39,10 +39,10 @@ const expressNemo = options => {
 
     return {
       nemoApp: nemoApp,
-      routedApp: routedApp,
+      routedApp: routedApp
     }
   }
-  
+
   const startApp = (listenServer) => {
     const server = listenServer.listen(PORT, () =>
       logger.info(`Server is now running on port ${PORT}`)
@@ -58,7 +58,7 @@ const expressNemo = options => {
     middlewares: middlewares,
 
     serve: async bootstrap => {
-      const {nemoApp, routedApp} = setupCommonApps();
+      const { nemoApp, routedApp } = setupCommonApps()
 
       await bootstrap(routedApp, middlewares)
 
@@ -67,7 +67,7 @@ const expressNemo = options => {
       startApp(nemoApp)
     },
     serveWithHttpServer: async bootstrap => {
-      const {nemoApp, routedApp} = setupCommonApps();
+      const { nemoApp, routedApp } = setupCommonApps()
 
       const httpServer = createServer(nemoApp)
 

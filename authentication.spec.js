@@ -1,4 +1,4 @@
-/* global describe context it beforeEach afterEach */
+/* global describe it */
 
 const chai = require('chai')
 const expect = chai.expect
@@ -52,7 +52,6 @@ const validKey = '-----BEGIN PRIVATE KEY-----\n' +
   '-----END PRIVATE KEY-----'
 
 describe('authentication.js', () => {
-
   it('should error on non-string', async () => {
     await expect(authentication.authenticate({ authorization: validToken })).to.be.rejectedWith(Error)
   })
@@ -70,26 +69,26 @@ describe('authentication.js', () => {
     const invalidToken = 'Bearer something.thatisnot.ajwttoken'
     await expect(authentication.authenticate(invalidToken)).to.be.rejectedWith(Error)
   })
-  
+
   describe('passing', () => {
     it('should return user on valid input', async () => {
-      sinon.stub(JwksClient.prototype, "getSigningKey").callsFake(async (kid) => {
-        if (kid === "abc123") {
+      sinon.stub(JwksClient.prototype, 'getSigningKey').callsFake(async (kid) => {
+        if (kid === 'abc123') {
           return {
             publicKey: validKey
           }
         }
         return {
-          publicKey: "invalidKey"
+          publicKey: 'invalidKey'
         }
       })
-      
+
       const auth2 = require('./authentication')
 
-      const res = await auth2.authenticate(validToken);
-      
-      expect(res.user.sub).to.be.equal('adfs|StenaADFS|nemo.test@stenaline.com');
-      expect(res.user['https://nemo.stena.io/windowsaccountname']).to.be.equal('LINE\\nemtes');
+      const res = await auth2.authenticate(validToken)
+
+      expect(res.user.sub).to.be.equal('adfs|StenaADFS|nemo.test@stenaline.com')
+      expect(res.user['https://nemo.stena.io/windowsaccountname']).to.be.equal('LINE\\nemtes')
     })
   })
 })
