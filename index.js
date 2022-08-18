@@ -43,8 +43,8 @@ const expressNemo = options => {
     }
   }
 
-  const startApp = (listenServer) => {
-    const server = listenServer.listen(PORT, () =>
+  const startApp = (app) => {
+    const server = app.listen(PORT, () =>
       logger.info(`Server is now running on port ${PORT}`)
     )
 
