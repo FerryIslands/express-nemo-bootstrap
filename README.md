@@ -128,6 +128,32 @@ When we have something we need to apply to all requests
   main();
 ````
 
+### Serve with Http Server
+
+In a situation where we want to host a GraphQL server with Subscriptions enabled, we need access to a HttpServer object
+
+```js
+  import * as nemo from "express-nemo-bootstrap";
+  const createRouter = require("./router");
+
+  async function main() {
+    nemo({
+      application: "tm-my-api",
+      basePath: "/api/my/",
+      healthchecks: []
+    }).serveWithHttpServer(async (expressServer, httpServer, middlewares) => {
+      const serviceRouter = await createRouter(middlewares);
+      
+      // Use httpServer
+      
+      expressServer.use(serviceRouter);
+    });
+  }
+
+  main();
+````
+
+
 ## Verifying api integration
 
 The repository contains a verification script tests for successful api integration/setup on a very basic level.
