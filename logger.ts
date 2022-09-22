@@ -1,5 +1,11 @@
-const moment = require('moment')
-const { merge: extend } = require('lodash')
+import * as moment from 'moment'
+import { merge as extend } from 'lodash'
+
+type LoggingLevel =
+| "debug"
+| "info"
+| "warn"
+| "error"
 
 const loggingDisabled = () => {
   return '' + process.env.LOGGING_DISABLED === 'true'
@@ -39,7 +45,7 @@ const getDefaultStructure = () => {
   }
 }
 
-const log = (data, level, context) => {
+const log = (data: any, level: LoggingLevel, context) => {
   let structureMessage
   const defaultStructure = getDefaultStructure()
 
@@ -77,8 +83,17 @@ const log = (data, level, context) => {
   }
 }
 
-class Logger {
-  constructor (options) {
+export interface LoggingOptions {
+  context: {
+    origin: {
+      name?: string;
+    }
+  }
+}
+
+export class Logger {
+  private context: {}
+  constructor (options: LoggingOptions) {
     options = options || {}
     this.context = {
       ...options.context
@@ -101,5 +116,3 @@ class Logger {
     log(data, 'error', this.context)
   }
 }
-
-module.exports = Logger

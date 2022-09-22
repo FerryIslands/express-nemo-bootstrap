@@ -1,5 +1,8 @@
-const createEndHandler = (options, middlewares) => {
-  const endHandler = (req, res, next) => {
+import {Response, NextFunction} from "express";
+import {NemoRequest, NemoOptions, Middlewares} from "./NemoTypes";
+
+export const createEndHandler = (options: NemoOptions, middlewares: Middlewares) => {
+  const endHandler = (req: NemoRequest, res: Response, next: NextFunction) => {
     if (options.postHandlerOptions) {
       req.context.postHandlerOptions = options.postHandlerOptions
     }
@@ -18,8 +21,4 @@ const createEndHandler = (options, middlewares) => {
   }
 
   return endHandler
-}
-
-module.exports = {
-  createEndHandler
 }

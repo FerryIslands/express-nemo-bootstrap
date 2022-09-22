@@ -1,4 +1,4 @@
-const { URL } = require('url')
+import { URL } from 'url'
 
 const isSecure = req =>
   req.connection.encrypted || req.headers['x-forwarded-proto'] === 'https'
@@ -41,7 +41,7 @@ const buildLogEvent = (req, le) => {
   return logEvent
 }
 
-const createRequestResponseLogEvent = (req, res) => {
+export const createRequestResponseLogEvent = (req, res) => {
   const url = new URL(getFullUrl(req))
   return buildLogEvent(req, {
     message: `${req.method} ${req.url} - HTTP ${res.statusCode}`,
@@ -66,7 +66,7 @@ const createRequestResponseLogEvent = (req, res) => {
   })
 }
 
-const createErrorLogEvent = (err, req) => {
+export const createErrorLogEvent = (err, req) => {
   const time =
           req.context &&
           req.context.performance &&
@@ -87,11 +87,4 @@ const createErrorLogEvent = (err, req) => {
       }
     }
   })
-}
-
-module.exports = _options => {
-  return {
-    createRequestResponseLogEvent,
-    createErrorLogEvent
-  }
 }
