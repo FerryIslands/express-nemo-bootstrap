@@ -50,27 +50,36 @@ const pinoLogger = pino({
 })
 
 const log = (data, level, context) => {
-  const logContext = {
+  let logContext = {
     context: extend({}, defaultStructure.context, context)
   }
+  let message
 
   if (!pathShouldBeLogged(data)) {
     return
   }
 
+  if (typeof data !== 'object') {
+    message = data
+  } else {
+    message = data.message
+    logContext = extend({}, data, logContext)
+    delete logContext.message
+  }
+
   if (!loggingDisabled()) {
     switch (level) {
       case 'debug':
-        pinoLogger.debug(logContext, data)
+        pinoLogger.debug(logContext, message)
         break
       case 'info':
-        pinoLogger.info(logContext, data)
+        pinoLogger.info(logContext, message)
         break
       case 'warn':
-        pinoLogger.warn(logContext, data)
+        pinoLogger.warn(logContext, message)
         break
       case 'error':
-        pinoLogger.error(logContext, data)
+        pinoLogger.error(logContext, message)
         break
     }
   }
