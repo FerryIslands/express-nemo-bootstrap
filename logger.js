@@ -1,5 +1,6 @@
 const moment = require('moment')
 const { merge: extend } = require('lodash')
+const pino = require('pino')
 
 const loggingDisabled = () => {
   return '' + process.env.LOGGING_DISABLED === 'true'
@@ -25,53 +26,51 @@ const pathShouldBeLogged = (structureMessage) => {
   return true
 }
 
-const getDefaultStructure = () => {
-  return {
-    timestamp: moment().format(),
-    level: 'debug',
-    message: 'Missing message!',
-    context: {
-      origin: {
-        name: 'express-nemo-bootstrap',
-        logger: 'logger.js'
-      }
+const defaultStructure = {
+  context: {
+    origin: {
+      name: 'express-nemo-bootstrap',
+      logger: 'logger.js'
     }
   }
 }
 
-const log = (data, level, context) => {
-  let structureMessage
-  const defaultStructure = getDefaultStructure()
+const pinoLogger = pino({
+  level: process.env.PINO_LOG_LEVEL || 'debug',
+  formatters: {
+    bindings (_) {
+      return {}
+    },
+    level (label) {
+      return { level: label }
+    }
+  },
+  messageKey: 'message',
+  timestamp: () => `,"timestamp":"${moment().format()}"`
+})
 
-  if (typeof data !== 'object') {
-    structureMessage = extend({}, defaultStructure, {
-      message: data,
-      level: level,
-      context: context
-    })
-  } else {
-    const extendedData = extend({}, data, {
-      timestamp: defaultStructure.timestamp,
-      level: level,
-      context: context
-    })
-    structureMessage = extend({}, defaultStructure, extendedData)
+const log = (data, level, context) => {
+  const logContext = {
+    context: extend({}, defaultStructure.context, context)
   }
 
-  if (!pathShouldBeLogged(structureMessage)) {
+  if (!pathShouldBeLogged(data)) {
     return
   }
 
   if (!loggingDisabled()) {
-    const msg = JSON.stringify(structureMessage)
     switch (level) {
       case 'debug':
+        pinoLogger.debug(logContext, data)
+        break
       case 'info':
+        pinoLogger.info(logContext, data)
+        break
       case 'warn':
-        console.log(msg)
+        pinoLogger.warn(logContext, data)
         break
       case 'error':
-        console.error(msg)
+        pinoLogger.error(logContext, data)
         break
     }
   }
