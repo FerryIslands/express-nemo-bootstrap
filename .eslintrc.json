@@ -1,7 +1,12 @@
 {
-  "rules": {
-    "jsx-quotes": ["error", "prefer-single"],
-    "no-unused-vars": ["error", { "argsIgnorePattern": "^_" }]
-  },
-  "extends": "standard"
+    "env": {
+        "browser": false,
+        "node": true,
+        "commonjs": true,
+        "es2021" : true
+    },
+    "extends": "standard",
+    "rules": {
+        "no-unused-vars": ["error", { "argsIgnorePattern": "^_" }]
+    }
 }

@@ -1,4 +1,3 @@
-
 const extendReqContext = (options) => {
   const appInsightsIf = (req, _res, next) => {
     if (options.appInsights) {

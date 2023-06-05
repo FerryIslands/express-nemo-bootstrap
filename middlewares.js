@@ -22,7 +22,7 @@ const { jwksOptions, validationOptions } = require('./authenticationOptions')
 const performaceMonitor = expressHttpContextPerformace()
 
 const enhancedBy = (req, res, next) => {
-  res.set('X-Ehanced-By', `express-nemo-bootstrap v.${version}`)
+  res.set('X-Enhanced-By', `express-nemo-bootstrap v.${version}`)
   next()
 }
 

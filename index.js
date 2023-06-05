@@ -38,8 +38,8 @@ const expressNemo = options => {
       .get('/health', middlewares.health)
 
     return {
-      nemoApp: nemoApp,
-      routedApp: routedApp
+      nemoApp,
+      routedApp
     }
   }
 
@@ -54,8 +54,8 @@ const expressNemo = options => {
   }
 
   return {
-    options: options,
-    middlewares: middlewares,
+    options,
+    middlewares,
 
     serve: async bootstrap => {
       const { nemoApp, routedApp } = setupCommonApps()

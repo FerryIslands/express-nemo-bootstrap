@@ -64,9 +64,9 @@ module.exports = _options => {
   }
 
   return {
-    notFoundResponse: notFoundResponse,
-    errorResponseTemplate: errorResponseTemplate,
-    pingResponse: pingResponse,
-    healthResponse: healthResponse
+    notFoundResponse,
+    errorResponseTemplate,
+    pingResponse,
+    healthResponse
   }
 }

@@ -1,4 +1,3 @@
-
 const jwksOptions = {
   cache: true,
   rateLimit: true,
