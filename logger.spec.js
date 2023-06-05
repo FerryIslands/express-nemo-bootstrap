@@ -1,13 +1,7 @@
 /* global describe context it beforeEach afterEach */
-
+const { spawn } = require('child_process')
 const expect = require('chai').expect
-const sinon = require('sinon')
-const moment = require('moment')
 const randomstring = require('randomstring')
-
-const Logger = require('./logger')
-
-const logger = new Logger()
 
 describe('logger.js', () => {
   beforeEach(() => {
@@ -18,88 +12,92 @@ describe('logger.js', () => {
     process.env.LOGGING_DISABLED = 'true'
   })
 
-  const captureConsole = (method, cb) => {
-    const sandbox = sinon.createSandbox()
-    const consoleStub = sandbox.stub(console, method)
-    cb()
-    const captured = consoleStub.getCall(0).args[0]
-    sandbox.restore()
-    return JSON.parse(captured)
+  const runLoggingAndReadStdOut = (logCall, cb) => {
+    const script = `
+    const Logger = require('./logger');
+    const logger = new Logger();
+    ${logCall}
+    `
+
+    const child = spawn('node', ['-e', script])
+
+    child.stdout.on('data', (data) => {
+      const json = JSON.parse(data.toString())
+      cb(json)
+    })
   }
 
   it('should log debug message to stdout', done => {
     const message = randomstring.generate(25)
-    const json = captureConsole('log', () => {
-      logger.debug(message)
-    })
+    const logCall = `logger.debug('${message}');`
 
-    const momentTimestamp = moment(json.timestamp, moment.ISO_8601, true)
-    expect(momentTimestamp.isValid()).to.equal(true)
-    expect(json.level).to.equal('debug')
-    expect(json.message).to.equal(message)
-    expect(json.context.origin.name).to.equal('express-nemo-bootstrap')
-    expect(json.context.origin.logger).to.equal('logger.js')
-    done()
+    runLoggingAndReadStdOut(logCall, json => {
+      expect(isValidDate(json.timestamp)).to.equal(true)
+      expect(json.level).to.equal('debug')
+      expect(json.message).to.equal(message)
+      expect(json.context.origin.name).to.equal('express-nemo-bootstrap')
+      expect(json.context.origin.logger).to.equal('logger.js')
+      done()
+    })
   })
 
   it('should log info message to stdout', done => {
     const message = randomstring.generate(25)
-    const json = captureConsole('log', () => {
-      logger.info(message)
-    })
+    const logCall = `logger.info('${message}');`
 
-    const momentTimestamp = moment(json.timestamp, moment.ISO_8601, true)
-    expect(momentTimestamp.isValid()).to.equal(true)
-    expect(json.level).to.equal('info')
-    expect(json.message).to.equal(message)
-    expect(json.context.origin.name).to.equal('express-nemo-bootstrap')
-    expect(json.context.origin.logger).to.equal('logger.js')
-    done()
+    runLoggingAndReadStdOut(logCall, json => {
+      expect(isValidDate(json.timestamp)).to.equal(true)
+      expect(json.level).to.equal('info')
+      expect(json.message).to.equal(message)
+      expect(json.context.origin.name).to.equal('express-nemo-bootstrap')
+      expect(json.context.origin.logger).to.equal('logger.js')
+      done()
+    })
   })
 
   it('should log warn message to stdout', done => {
     const message = randomstring.generate(25)
-    const json = captureConsole('log', () => {
-      logger.warn(message)
-    })
+    const logCall = `logger.warn('${message}');`
 
-    const momentTimestamp = moment(json.timestamp, moment.ISO_8601, true)
-    expect(momentTimestamp.isValid()).to.equal(true)
-    expect(json.level).to.equal('warn')
-    expect(json.message).to.equal(message)
-    expect(json.context.origin.name).to.equal('express-nemo-bootstrap')
-    expect(json.context.origin.logger).to.equal('logger.js')
-    done()
+    runLoggingAndReadStdOut(logCall, json => {
+      expect(isValidDate(json.timestamp)).to.equal(true)
+      expect(json.level).to.equal('warn')
+      expect(json.message).to.equal(message)
+      expect(json.context.origin.name).to.equal('express-nemo-bootstrap')
+      expect(json.context.origin.logger).to.equal('logger.js')
+      done()
+    })
   })
 
   it('should log error message to stderr', done => {
     const message = randomstring.generate(25)
-    const json = captureConsole('error', () => {
-      logger.error(message)
-    })
+    const logCall = `logger.error('${message}');`
 
-    const momentTimestamp = moment(json.timestamp, moment.ISO_8601, true)
-    expect(momentTimestamp.isValid()).to.equal(true)
-    expect(json.level).to.equal('error')
-    expect(json.message).to.equal(message)
-    expect(json.context.origin.name).to.equal('express-nemo-bootstrap')
-    expect(json.context.origin.logger).to.equal('logger.js')
-    done()
+    runLoggingAndReadStdOut(logCall, json => {
+      expect(isValidDate(json.timestamp)).to.equal(true)
+      expect(json.level).to.equal('error')
+      expect(json.message).to.equal(message)
+      expect(json.context.origin.name).to.equal('express-nemo-bootstrap')
+      expect(json.context.origin.logger).to.equal('logger.js')
+      done()
+    })
   })
 
   describe('logging structured message', () => {
     let result
 
-    const logDebugReturnData = data => {
-      result = captureConsole('log', () => {
-        logger.debug(data)
+    const logDebugReturnData = (data, done) => {
+      const logCall = `logger.debug(${JSON.stringify(data)});`
+      runLoggingAndReadStdOut(logCall, json => {
+        result = json
+        done()
       })
       return data
     }
 
     context('missing default data', () => {
-      beforeEach(() => {
-        logDebugReturnData({})
+      beforeEach((done) => {
+        logDebugReturnData({}, done)
       })
 
       it('should log with level debug', done => {
@@ -108,12 +106,11 @@ describe('logger.js', () => {
       })
 
       it('should log with timestamp', async () => {
-        const momentTimestamp = moment(result.timestamp, moment.ISO_8601, true)
-        expect(momentTimestamp.isValid()).to.equal(true)
+        expect(isValidDate(result.timestamp)).to.equal(true)
       })
 
       it('should log message', async () => {
-        expect(result.message).to.equal('Missing message!')
+        expect(result.message).to.equal('')
       })
 
       it('should add origin:name', async () => {
@@ -128,7 +125,7 @@ describe('logger.js', () => {
     context('overriding default data', () => {
       let data
 
-      beforeEach(() => {
+      beforeEach((done) => {
         data = logDebugReturnData({
           level: randomstring.generate(10),
           timestamp: randomstring.generate(10),
@@ -139,7 +136,7 @@ describe('logger.js', () => {
               logger: randomstring.generate(20)
             }
           }
-        })
+        }, done)
       })
 
       it('should not allow override of level debug', async () => {
@@ -147,8 +144,7 @@ describe('logger.js', () => {
       })
 
       it('should not allow override of timestamp', async () => {
-        const momentTimestamp = moment(result.timestamp, moment.ISO_8601, true)
-        expect(momentTimestamp.isValid()).to.equal(true)
+        expect(isValidDate(result.timestamp)).to.equal(true)
       })
 
       it('should log message', async () => {
@@ -169,14 +165,14 @@ describe('logger.js', () => {
     context('partially overriding default data', () => {
       let data
 
-      beforeEach(() => {
+      beforeEach((done) => {
         data = logDebugReturnData({
           context: {
             origin: {
               name: randomstring.generate(25)
             }
           }
-        })
+        }, done)
       })
 
       it('should override origin:name', async () => {
@@ -191,14 +187,14 @@ describe('logger.js', () => {
     context('extending context', () => {
       let data
 
-      beforeEach(() => {
+      beforeEach((done) => {
         data = logDebugReturnData({
           context: {
             custom: {
               foo: { name: randomstring.generate(25) }
             }
           }
-        })
+        }, done)
       })
 
       it('should should not remove context:origin', async () => {
@@ -213,7 +209,7 @@ describe('logger.js', () => {
     context('logging event', () => {
       let data
 
-      beforeEach(() => {
+      beforeEach((done) => {
         data = logDebugReturnData({
           event: {
             custom: {
@@ -222,7 +218,7 @@ describe('logger.js', () => {
               }
             }
           }
-        })
+        }, done)
       })
 
       it('should add event', async () => {
@@ -231,3 +227,7 @@ describe('logger.js', () => {
     })
   })
 })
+
+function isValidDate (d) {
+  return !isNaN(Date.parse(d))
+}

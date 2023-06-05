@@ -1,4 +1,3 @@
-const moment = require('moment')
 const { merge: extend } = require('lodash')
 const pino = require('pino')
 
@@ -46,7 +45,7 @@ const pinoLogger = pino({
     }
   },
   messageKey: 'message',
-  timestamp: () => `,"timestamp":"${moment().format()}"`
+  timestamp: () => `,"timestamp":"${new Date(Date.now()).toISOString()}"`
 })
 
 const log = (data, level, context) => {
@@ -60,11 +59,13 @@ const log = (data, level, context) => {
   }
 
   if (typeof data !== 'object') {
-    message = data
+    message = data ?? ''
   } else {
-    message = data.message
-    logContext = extend({}, data, logContext)
+    message = data.message ?? ''
+    logContext = extend({}, logContext, data)
     delete logContext.message
+    delete logContext.level
+    delete logContext.timestamp
   }
 
   if (!loggingDisabled()) {
