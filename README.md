@@ -11,7 +11,7 @@ Run this scipt after you have tagged a new release with vX.Y.Z and pushed it wit
 This script requires these binaries
 
 ````bash
-  brew install node@14
+  brew install node@18
   brew install hub
   brew install jq
 ````
@@ -19,8 +19,8 @@ This script requires these binaries
 You need to update script variables in the top of the script: update-projects-dependency.sh
 
 * newVersion='vX.Y.Z', set a valid version
-* featureId='SET PBI ITEM', set the PBI number taht we should reference
-* [optional] add/remove projects from 'projectWithNemoBootstrap' dont forget to add/remove corresponding item index in 'projectPackageManager'
+* featureId='SET PBI ITEM', set the PBI number that we should reference
+* [optional] add/remove projects from 'projectWithNemoBootstrap' don't forget to add/remove corresponding item index in 'projectPackageManager'
 
 ### Run it
 
@@ -48,7 +48,7 @@ At the end it will output links to all created pull requests
 
 ## Application Insights
 
-Setting up Appplication Insights in express-nemo-bootstrap
+Setting up Application Insights in express-nemo-bootstrap
 
 ### Enabling Application Insights
 
@@ -58,7 +58,7 @@ exporting environment variable __AI_INSTRUMENTATION_KEY__.
 
 Each request coming to the server have the  __req.context.appInsights__ which can be used to setup for example a [Telementryclient](https://docs.microsoft.com/en-us/azure/azure-monitor/app/nodejs#telemetryclient-api)
 
-Example, cusomize on single request)
+Example, customize on single request)
 
 ```js
   yourOwnEndpoint(req, res) {
@@ -143,9 +143,9 @@ In a situation where we want to host a GraphQL server with Subscriptions enabled
       healthchecks: []
     }).serveWithHttpServer(async (expressServer, httpServer, middlewares) => {
       const serviceRouter = await createRouter(middlewares);
-      
+
       // Use httpServer
-      
+
       expressServer.use(serviceRouter);
     });
   }
@@ -165,7 +165,7 @@ Test includes header checks, ping and health endpoint checks, 404 handling etc.
 ./scripts/verify <url>
 ```
 
-The url should be substituted with the full url to the api you want to run the checks agains (i.e. <http://localhost:4000/api/internal>).
+The url should be substituted with the full url to the api you want to run the checks against (i.e. <http://localhost:4000/api/internal>).
 
 ## Example
 

@@ -5,7 +5,7 @@ const expressHttpContextAuth0JwtVerify = require('express-nemo-auth0-jwt-verify'
 const expressHttpContextCorrelationId = require('express-nemo-correlation-id')
 const expressHttpContextLogger = require('express-nemo-logger')
 const expressHttpContextRequestResponseLogger = require('express-nemo-request-response-logger')
-const expressHttpContextPerformace = require('express-nemo-performance')
+const expressHttpContextPerformance = require('express-nemo-performance')
 const expressHttpContextErrorResponse = require('express-nemo-error-response')
 const expressHttpContextErrorLogger = require('express-nemo-error-logger')
 const expressHttpNotFoundRoute = require('express-nemo-route-not-found')
@@ -19,7 +19,7 @@ const { merge: extend } = require('lodash')
 const { version } = require('./package.json')
 const { jwksOptions, validationOptions } = require('./authenticationOptions')
 
-const performaceMonitor = expressHttpContextPerformace()
+const performanceMonitor = expressHttpContextPerformance()
 
 const enhancedBy = (req, res, next) => {
   res.set('X-Enhanced-By', `express-nemo-bootstrap v.${version}`)
@@ -140,13 +140,13 @@ module.exports = options => {
     pre: [
       sentryPre,
       enhancedBy,
-      performaceMonitor.start,
+      performanceMonitor.start,
       corsIf,
       expressHttpContextCorrelationId(),
       appInsights.extendReqContext(options),
       expressHttpContextLogger({ loggerFactory }),
       createEndHandler(options, [
-        performaceMonitor.end,
+        performanceMonitor.end,
         requestResponseLogger
       ])
     ],
@@ -163,7 +163,7 @@ module.exports = options => {
     }),
 
     post: [
-      performaceMonitor.error,
+      performanceMonitor.error,
       expressHttpNotFoundRoute(responseFactory.notFoundResponse),
       sentryError,
       expressHttpContextErrorLogger({
