@@ -1,4 +1,3 @@
-const moment = require('moment')
 const HttpStatus = require('http-status-codes')
 
 const debugEnabled = () => process.env.NODE_ENV === 'DEV'
@@ -48,7 +47,7 @@ module.exports = _options => {
 
   const pingResponse = (_req, _res) => {
     return {
-      "I'm alive": moment().format()
+      "I'm alive": new Date().toISOString()
     }
   }
 
