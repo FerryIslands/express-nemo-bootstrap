@@ -1,5 +1,5 @@
-const moment = require('moment')
 const { merge: extend } = require('lodash')
+const pino = require('pino')
 
 const loggingDisabled = () => {
   return '' + process.env.LOGGING_DISABLED === 'true'
@@ -25,53 +25,62 @@ const pathShouldBeLogged = (structureMessage) => {
   return true
 }
 
-const getDefaultStructure = () => {
-  return {
-    timestamp: moment().format(),
-    level: 'debug',
-    message: 'Missing message!',
-    context: {
-      origin: {
-        name: 'express-nemo-bootstrap',
-        logger: 'logger.js'
-      }
+const defaultStructure = {
+  context: {
+    origin: {
+      name: 'express-nemo-bootstrap',
+      logger: 'logger.js'
     }
   }
 }
 
+const pinoLogger = pino({
+  level: process.env.PINO_LOG_LEVEL || 'debug',
+  formatters: {
+    bindings (_) {
+      return {}
+    },
+    level (label) {
+      return { level: label }
+    }
+  },
+  messageKey: 'message',
+  timestamp: () => `,"timestamp":"${new Date(Date.now()).toISOString()}"`
+})
+
 const log = (data, level, context) => {
-  let structureMessage
-  const defaultStructure = getDefaultStructure()
-
-  if (typeof data !== 'object') {
-    structureMessage = extend({}, defaultStructure, {
-      message: data,
-      level: level,
-      context: context
-    })
-  } else {
-    const extendedData = extend({}, data, {
-      timestamp: defaultStructure.timestamp,
-      level: level,
-      context: context
-    })
-    structureMessage = extend({}, defaultStructure, extendedData)
+  let logContext = {
+    context: extend({}, defaultStructure.context, context)
   }
+  let message
 
-  if (!pathShouldBeLogged(structureMessage)) {
+  if (!pathShouldBeLogged(data)) {
     return
   }
 
+  if (typeof data !== 'object') {
+    message = data ?? ''
+  } else {
+    message = data.message ?? ''
+    logContext = extend({}, logContext, data)
+    delete logContext.message
+    delete logContext.level
+    delete logContext.timestamp
+  }
+
   if (!loggingDisabled()) {
-    const msg = JSON.stringify(structureMessage)
     switch (level) {
       case 'debug':
+        pinoLogger.debug(logContext, message)
+        break
       case 'info':
+        pinoLogger.info(logContext, message)
+        break
       case 'warn':
-        console.log(msg)
+        pinoLogger.warn(logContext, message)
         break
       case 'error':
-        console.error(msg)
+        pinoLogger.error(logContext, message)
         break
     }
   }
