@@ -32,7 +32,7 @@ describe('logger.js', () => {
     const logCall = `logger.debug('${message}');`
 
     runLoggingAndReadStdOut(logCall, json => {
-      expect(isValidDate(json.timestamp)).to.equal(true)
+      expect(isValidIsoFormattedDate(json.timestamp)).to.equal(true)
       expect(json.level).to.equal('debug')
       expect(json.message).to.equal(message)
       expect(json.context.origin.name).to.equal('express-nemo-bootstrap')
@@ -46,7 +46,7 @@ describe('logger.js', () => {
     const logCall = `logger.info('${message}');`
 
     runLoggingAndReadStdOut(logCall, json => {
-      expect(isValidDate(json.timestamp)).to.equal(true)
+      expect(isValidIsoFormattedDate(json.timestamp)).to.equal(true)
       expect(json.level).to.equal('info')
       expect(json.message).to.equal(message)
       expect(json.context.origin.name).to.equal('express-nemo-bootstrap')
@@ -60,7 +60,7 @@ describe('logger.js', () => {
     const logCall = `logger.warn('${message}');`
 
     runLoggingAndReadStdOut(logCall, json => {
-      expect(isValidDate(json.timestamp)).to.equal(true)
+      expect(isValidIsoFormattedDate(json.timestamp)).to.equal(true)
       expect(json.level).to.equal('warn')
       expect(json.message).to.equal(message)
       expect(json.context.origin.name).to.equal('express-nemo-bootstrap')
@@ -74,7 +74,7 @@ describe('logger.js', () => {
     const logCall = `logger.error('${message}');`
 
     runLoggingAndReadStdOut(logCall, json => {
-      expect(isValidDate(json.timestamp)).to.equal(true)
+      expect(isValidIsoFormattedDate(json.timestamp)).to.equal(true)
       expect(json.level).to.equal('error')
       expect(json.message).to.equal(message)
       expect(json.context.origin.name).to.equal('express-nemo-bootstrap')
@@ -106,7 +106,7 @@ describe('logger.js', () => {
       })
 
       it('should log with timestamp', async () => {
-        expect(isValidDate(result.timestamp)).to.equal(true)
+        expect(isValidIsoFormattedDate(result.timestamp)).to.equal(true)
       })
 
       it('should log message', async () => {
@@ -144,7 +144,7 @@ describe('logger.js', () => {
       })
 
       it('should not allow override of timestamp', async () => {
-        expect(isValidDate(result.timestamp)).to.equal(true)
+        expect(isValidIsoFormattedDate(result.timestamp)).to.equal(true)
       })
 
       it('should log message', async () => {
@@ -228,6 +228,7 @@ describe('logger.js', () => {
   })
 })
 
-function isValidDate (d) {
-  return !isNaN(Date.parse(d))
+function isValidIsoFormattedDate (d) {
+  const parsed = Date.parse(d)
+  return !isNaN(parsed) && new Date(parsed).toISOString() === d
 }
