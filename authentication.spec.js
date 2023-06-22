@@ -18,9 +18,9 @@ const { JwksClient } = require('jwks-rsa')
 //   "iat": 946684800,
 //   "exp": 32503680000,
 //   "aud": "https://nemo.stena.io/api",
-//   "sub": "adfs|StenaADFS|nemo.test@stenaline.com",
+//   "sub": "samlp|AzureViaSaml|nemo.test@stenaline.com",
 //   "https://nemo.stena.io/windowsaccountname": "LINE\\nemtes"
-const validToken = 'Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6ImFiYzEyMyJ9.eyJpc3MiOiJodHRwczovL25lbTAuZXUuYXV0aDAuY29tLyIsImlhdCI6OTQ2Njg0ODAwLCJleHAiOjMyNTAzNjgwMDAwLCJhdWQiOiJodHRwczovL25lbW8uc3RlbmEuaW8vYXBpIiwic3ViIjoiYWRmc3xTdGVuYUFERlN8bmVtby50ZXN0QHN0ZW5hbGluZS5jb20iLCJodHRwczovL25lbW8uc3RlbmEuaW8vd2luZG93c2FjY291bnRuYW1lIjoiTElORVxcbmVtdGVzIn0.rgAa3Dv2Ge8Yr29iiYM3258KPujC-HYSzr6hXDBBmKfJl8D2Nk0O_M7PoCZm0D_XP3kK2XjmWrs3_SfJmavtdQ49Plfx3qlYcBPHnOO43KS3k3eHou1-Qc4rSqeginw8EUn3ZZ6agtGBlP4rYdxs5A5TewMpeOcN2RCU4edOVetiRWq_P56WaK379mJ-N7o0kV4s-bRsqoOyVUnC1zgnZkcKWgI4zuxo5v1HS05T1xj7IjPueJzuxe1pXadIQ-qJEgdpZtbiTQKf_pByHROJZmPmIZdlVK7Mx2wQfPAqoqkla4m8A6W8ohFMPku5h6ukPecrSr2rBe2wzZ0BLCuCgQ'
+const validToken = 'Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6ImFiYzEyMyJ9.eyJpc3MiOiJodHRwczovL25lbTAuZXUuYXV0aDAuY29tLyIsImlhdCI6OTQ2Njg0ODAwLCJleHAiOjMyNTAzNjgwMDAwLCJhdWQiOiJodHRwczovL25lbW8uc3RlbmEuaW8vYXBpIiwic3ViIjoic2FtbHB8QXp1cmVWaWFTYW1sfG5lbW8udGVzdEBzdGVuYWxpbmUuY29tIiwiaHR0cHM6Ly9uZW1vLnN0ZW5hLmlvL3dpbmRvd3NhY2NvdW50bmFtZSI6IkxJTkVcXG5lbXRlcyJ9.n7OlW44wb9ZEJ4338FxNDA7FJr0SLvbiUeiIPd5cvj1eDp6Vzvnaulvryvpo11XmMkr7b9nyZhHvaFlltyFNaCT8CJjZeOhYPoSaYg88Evp_BVUceMSqo8abdYIMsbEN-_JKZ4mqKpqkcnDHd2KCzfhE_aRYwntx3_q6wvXWWaWeYs092a9lEVGOeRWj0_MuS1ltGQaT40y4JIrQpQbE04c827IAPHQRSNAym8_xph0x9qxDM7ZK2dqvazXjua_hwG3T-lCl1Rar0ahO0HnV2G24xPW4om2-SsTvC9U8Rhmgve3bOVI_YCb3pcAXhcX2beXjPneONYxc13k7dTN84w'
 // private key for the fake token
 const validKey = '-----BEGIN PRIVATE KEY-----\n' +
   'MIIEvwIBADANBgkqhkiG9w0BAQEFAASCBKkwggSlAgEAAoIBAQC7VJTUt9Us8cKj\n' +
@@ -87,7 +87,7 @@ describe('authentication.js', () => {
 
       const res = await auth2.authenticate(validToken)
 
-      expect(res.user.sub).to.be.equal('adfs|StenaADFS|nemo.test@stenaline.com')
+      expect(res.user.sub).to.be.equal('samlp|AzureViaSaml|nemo.test@stenaline.com')
       expect(res.user['https://nemo.stena.io/windowsaccountname']).to.be.equal('LINE\\nemtes')
     })
   })
