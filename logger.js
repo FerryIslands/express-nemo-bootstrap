@@ -50,7 +50,7 @@ const pinoLogger = pino({
 
 const log = (data, level, context) => {
   let logContext = {
-    context: extend({}, defaultStructure.context, context)
+    context: extend(defaultStructure.context, context)
   }
   let message
 
@@ -62,10 +62,8 @@ const log = (data, level, context) => {
     message = data ?? ''
   } else {
     message = data.message ?? ''
-    logContext = extend({}, logContext, data)
-    delete logContext.message
-    delete logContext.level
-    delete logContext.timestamp
+    const { message, level, timestamp, ...dataProps } = data
+    logContext = extend(dataProps, logContext)
   }
 
   if (!loggingDisabled()) {
