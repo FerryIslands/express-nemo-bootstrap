@@ -35,7 +35,7 @@ const defaultStructure = {
 }
 
 const pinoLogger = pino({
-  level: process.env.PINO_LOG_LEVEL || 'debug',
+  level: process.env.PINO_LOG_LEVEL || 'info',
   formatters: {
     bindings (_) {
       return {}
