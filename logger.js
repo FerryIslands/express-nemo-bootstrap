@@ -52,35 +52,34 @@ const log = (data, level, context) => {
   let logContext = {
     context: extend({}, defaultStructure.context, context)
   }
-  let message
+  let logMessage
 
   if (!pathShouldBeLogged(data)) {
     return
   }
 
   if (typeof data !== 'object') {
-    message = data ?? ''
+    logMessage = data ?? ''
   } else {
-    message = data.message ?? ''
-    logContext = extend({}, logContext, data)
-    delete logContext.message
-    delete logContext.level
-    delete logContext.timestamp
+    logMessage = data.message ?? ''
+    // eslint-disable-next-line no-unused-vars
+    const { message, level, timestamp, ...dataProps } = data
+    logContext = extend({}, dataProps, logContext)
   }
 
   if (!loggingDisabled()) {
     switch (level) {
       case 'debug':
-        pinoLogger.debug(logContext, message)
+        pinoLogger.debug(logContext, logMessage)
         break
       case 'info':
-        pinoLogger.info(logContext, message)
+        pinoLogger.info(logContext, logMessage)
         break
       case 'warn':
-        pinoLogger.warn(logContext, message)
+        pinoLogger.warn(logContext, logMessage)
         break
       case 'error':
-        pinoLogger.error(logContext, message)
+        pinoLogger.error(logContext, logMessage)
         break
     }
   }
