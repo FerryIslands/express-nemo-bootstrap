@@ -62,6 +62,7 @@ const log = (data, level, context) => {
     logMessage = data ?? ''
   } else {
     logMessage = data.message ?? ''
+    // eslint-disable-next-line no-unused-vars
     const { message, level, timestamp, ...dataProps } = data
     logContext = extend({}, dataProps, logContext)
   }
