@@ -130,7 +130,8 @@ module.exports = options => {
   }
 
   const requestResponseLogger = expressHttpContextRequestResponseLogger({
-    logEventFactory: logEventFactory.createRequestResponseLogEvent
+    logEventFactory: logEventFactory.createRequestResponseLogEvent,
+    loggerFunctionName: 'info'
   })
 
   return {
